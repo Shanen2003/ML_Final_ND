@@ -241,7 +241,7 @@ print(accuracy_score(y_test, test_pred_cls)) # Get classification report
 # Now we will weight it!
 
 # # Count values
-# counts = pd.Series(y_train).value_counts().sort_index()
+counts = pd.Series(y_train).value_counts().sort_index()
 neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
 # print(f"Number of negative samples: {neg}")
 # print(f"Number of positive samples: {pos}")
