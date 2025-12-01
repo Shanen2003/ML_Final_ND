@@ -243,19 +243,19 @@ dtest  = xgb.DMatrix(data=X_test.values,  label=y_test)
 
 # # Now we will weight it!
 
-# # # Count values
-# counts = pd.Series(y_train).value_counts().sort_index()
-# neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
-# # print(f"Number of negative samples: {neg}")
-# # print(f"Number of positive samples: {pos}")
+# # Count values
+counts = pd.Series(y_train).value_counts().sort_index()
+neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
+# print(f"Number of negative samples: {neg}")
+# print(f"Number of positive samples: {pos}")
 
-# # Calculate ratio
-# ratio = neg / pos
-# # Set ratio as weight for positive samples
-# w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
+# Calculate ratio
+ratio = neg / pos
+# Set ratio as weight for positive samples
+w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
 
-# # Build weighted DMatrices
-# dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
+# Build weighted DMatrices
+dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
 
 # watchlist = [(dtrain_w, "train")] # Set data for evaluation
 # xgb_w = xgb.train(params, # Set parameters
@@ -295,7 +295,7 @@ params = {
 # Run CV inside XGBoost
 cv_res = xgb.cv(
     params=params,
-    dtrain=dtrain,              # Training data (DMatrix)
+    dtrain=dtrain_w,              # Training data (DMatrix)
     num_boost_round=400,       # Number of rounds
     nfold=5,                    # 5-fold CV
     verbose_eval=20,            # Print every 20 iters
@@ -343,7 +343,7 @@ def run_one_cv(md, mcw):
 
     cv = xgb.cv(
         params=params,
-        dtrain=dtrain,              # DMatrix from earlier
+        dtrain=dtrain_w,              # DMatrix from earlier
         num_boost_round=1000,        # nrounds = 100
         nfold=5,                    # 5-fold CV
         early_stopping_rounds=20,   # stop if no improvement
@@ -422,8 +422,8 @@ for g in tqdm(gamma_vals, desc="Gamma CV (serial)"): # For each gamma value
     # Run xgb.cv
     cv = xgb.cv(
         params=params,
-        dtrain=dtrain,                # Set training data
-        num_boost_round=100,          # Set number of rounds
+        dtrain=dtrain_w,                # Set training data
+        num_boost_round=1000,          # Set number of rounds
         nfold=5,                      # Set folds for cross validation
         early_stopping_rounds=20,     # Set early stopping rounds
         stratified=True,
@@ -447,8 +447,8 @@ for g in tqdm(gamma_vals, desc="Gamma CV (serial)"): # For each gamma value
 gamma_results = (pd.DataFrame(rows)
                    .sort_values(['test_error', 'test_auc'], ascending=[True, False])
                    .reset_index(drop=True))
-# View results
-display(gamma_results)
+# # View results
+# display(gamma_results)
 # Extract best value
 best_gamma = float(gamma_results.iloc[0]['gamma'])
 # Print out vest value
@@ -488,8 +488,8 @@ def run_one_cv(subsample, colsample_bytree):
     # Run xgb.cv
     cv = xgb.cv(
         params=params,  # Set parameters
-        dtrain=dtrain,  # Set training data
-        num_boost_round=100, # Set number of rounds
+        dtrain=dtrain_w,  # Set training data
+        num_boost_round=1000, # Set number of rounds
         nfold=5,  # Set cross-validation folds
         early_stopping_rounds=20, # Set number of early stopping rounds
         stratified=True,
@@ -518,8 +518,8 @@ for p in tqdm(param_grid, desc="Subsample × Colsample_bytree CV (serial)"):
 sc_results = (pd.DataFrame(rows)
                 .sort_values(['test_error','test_auc'], ascending=[True, False])
                 .reset_index(drop=True))
-# View results
-display(sc_results.head(10))
+# # View results
+# display(sc_results.head(10))
 # Identify best results
 best_sc = sc_results.iloc[0].to_dict()
 # Store best results
@@ -557,10 +557,10 @@ for eta in tqdm(etas, desc="Learning-rate CV (serial)"):
     # Apply xgb.cv
     cv = xgb.cv(
         params=params, # Set parameters
-        dtrain=dtrain, # Set training data
+        dtrain=dtrain_w, # Set training data
         num_boost_round=1000,  # run to 1000 unless ES stops early
         nfold=5, # Set folds for cross validation
-        early_stopping_rounds=100, # Set early stopping rounds
+        early_stopping_rounds=20, # Set early stopping rounds
         stratified=True,
         shuffle=True,
         verbose_eval=False,
@@ -603,3 +603,13 @@ tuned_eta = float(best_eta) # Extract best learning rate
 
 
 
+print(
+    f"\nFinal tuned hyperparameters:\n"
+    f"  max_depth        = {tuned_max_depth}\n"
+    f"  min_child_weight = {tuned_min_child}\n"
+    f"  gamma            = {tuned_gamma}\n"
+    f"  subsample        = {tuned_subsample}\n"
+    f"  colsample_bytree = {tuned_colsample}\n"
+    f"  eta              = {tuned_eta}\n"
+    f"  best_round       = {best_round}"
+)
