@@ -109,8 +109,8 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 # df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
-y = df["Normal_Attack"].to_numpy()
-X = df.drop(columns=["Normal_Attack", 'Timestamp'])
+y = df_train["Normal_Attack"].to_numpy()
+X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
