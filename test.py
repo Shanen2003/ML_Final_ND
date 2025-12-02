@@ -257,29 +257,29 @@ w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
 # Build weighted DMatrices
 dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
 
-watchlist = [(dtrain_w, "train")] # Set data for evaluation
-xgb_w = xgb.train(params, # Set parameters
-                    dtrain_w,  # Set training data
-                    num_boost_round=3, # Set number of rounds
-                    evals=watchlist,  # Set data to evaluate on
-                    verbose_eval=50) # Set print out frequency
+# watchlist = [(dtrain_w, "train")] # Set data for evaluation
+# xgb_w = xgb.train(params, # Set parameters
+#                     dtrain_w,  # Set training data
+#                     num_boost_round=3, # Set number of rounds
+#                     evals=watchlist,  # Set data to evaluate on
+#                     verbose_eval=50) # Set print out frequency
 
-test_pred_w = xgb_w.predict(dtest) # Create predictions
-
-
-# Convert predictions into classes at 0.5
-test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+# test_pred_w = xgb_w.predict(dtest) # Create predictions
 
 
-print("\nConfusion matrix:")
-cm = (confusion_matrix(y_test, test_pred_cls_w))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("\nAccuracy):")
-print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+# # Convert predictions into classes at 0.5
+# test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+
+
+# print("\nConfusion matrix:")
+# cm = (confusion_matrix(y_test, test_pred_cls_w))
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+# plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
+# plt.close()
+# print("\nAccuracy):")
+# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
 
 
 
@@ -685,13 +685,13 @@ params = {
 num_boost_round = best_round # Set number of rounds
 
 watchlist = [(dtrain_w, "train")] # Set data for evaluation
-xgb_w = xgb.train(params, # Set parameters
+xgb_tuned = xgb.train(params, # Set parameters
                     dtrain_w,  # Set training data
                     num_boost_round=num_boost_round, # Set number of rounds
                     evals=watchlist,  # Set data to evaluate on
                     verbose_eval=50) # Set print out frequency
 
-test_pred_w = xgb_w.predict(dtest) # Create predictions
+test_pred_w = xgb_tuned.predict(dtest) # Create predictions
 
 
 # Convert predictions into classes at 0.5
@@ -707,3 +707,27 @@ plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tig
 plt.close()
 print("\nAccuracy):")
 print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+# SHAP values to see importance of each column in the weighted tuned XGBoost model
+
+# Create TreeExplainer and compute SHAP values
+explainer = shap.TreeExplainer(xgb_tuned)
+shap_values = explainer(X_train)
+
+plt.figure()  # start a clean figure
+shap.plots.bar(shap_values, max_display=10)
+plt.title("Top 10 SHAP Feature Importances")   # optional title
+plt.savefig("shap_bar_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+# Initialize JS (interactive if you're in notebook—safe to leave)
+shap.initjs()
+
+# Create and save beeswarm plot
+plt.figure(figsize=(10, 8))   # optional: wider figure
+shap.plots.beeswarm(shap_values, max_display=25)
+plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
+plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+plt.close()
+
