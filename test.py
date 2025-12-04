@@ -308,59 +308,59 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
-# # Bagging and random forest 
+# Bagging and random forest 
 
 # Decision Tree
 
-# train_mask = ~X_train.isna().any(axis=1)
-# X_train = X_train[train_mask]
-# y_train = y_train[train_mask]
+train_mask = ~X_train.isna().any(axis=1)
+X_train = X_train[train_mask]
+y_train = y_train[train_mask]
 
-# test_mask = ~X_test.isna().any(axis=1)
-# X_test = X_test[test_mask]
-# y_test = y_test[test_mask]
+test_mask = ~X_test.isna().any(axis=1)
+X_test = X_test[test_mask]
+y_test = y_test[test_mask]
 
-# tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
-# tree_model.fit(X_train, y_train) # Fit tree
+tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
+tree_model.fit(X_train, y_train) # Fit tree
 
-# # Encode labels for visualziation
-# le = preprocessing.LabelEncoder()
-# y_train_enc = le.fit_transform(y_train)
+# Encode labels for visualziation
+le = preprocessing.LabelEncoder()
+y_train_enc = le.fit_transform(y_train)
 
-# # Set up visualization
-# viz_model = dtreeviz.model(
-#     tree_model,
-#     X_train=X_train,
-#     y_train=y_train_enc,
-#     feature_names=list(X_train.columns),
-#     target_name="outcome",
-#     class_names=[str(c) for c in le.classes_]
-# )
-# v = viz_model.view(fontname="DejaVu Sans")
-# v.save("decision_tree_viz.svg") # Save visualization
+# Set up visualization
+viz_model = dtreeviz.model(
+    tree_model,
+    X_train=X_train,
+    y_train=y_train_enc,
+    feature_names=list(X_train.columns),
+    target_name="outcome",
+    class_names=[str(c) for c in le.classes_]
+)
+v = viz_model.view(fontname="DejaVu Sans")
+v.save("decision_tree_viz.svg") # Save visualization
 
-# y_pred = tree_model.predict(X_test)
-# acc = accuracy_score(y_test, y_pred)
-# # y_pred_enc = tree_model.predict(X_test) # Create predictions
-# # y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
-# acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
-# print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
+y_pred = tree_model.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
+# y_pred_enc = tree_model.predict(X_test) # Create predictions
+# y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
+acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
+print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
 
-# cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
-# disp.plot(cmap="Blues") # Set color map
-# plt.title("Confusion Matrix — Decision Tree") # Set title
-# plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
-# plt.show() # Display plot
-
-
+cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Decision Tree") # Set title
+plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
+plt.show() # Display plot
 
 
 
-# ##HOW TO SAVE
-# ##plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-# ##plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
-# ##plt.close()
+
+
+##HOW TO SAVE
+##plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+##plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
+##plt.close()
 
 
 
@@ -382,10 +382,11 @@ bag_model = BaggingClassifier(
 
 bag_model.fit(X_train, y_train)
 
-y_pred_enc = bag_model.predict(X_test) # Create predictions
-y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
-#???? MAYBE UNNEEDED ^^^^^
+y_pred = bag_model.predict(X_test)
 
+# Delete if runs
+# y_pred_enc = bag_model.predict(X_test) # Create predictions
+# y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
 
 acc = accuracy_score(y_test, y_pred)
 print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
@@ -397,6 +398,7 @@ cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion
 disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
 disp.plot(cmap="Blues") # Set colors
 plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
+plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
 plt.show() # Display plot
 
 
@@ -443,7 +445,8 @@ g_1 =(
     )
 )
 
-g_1
+g_1.save("oob_error_vs_trees.png", dpi=300)
+
 
 best_row = oob_df.loc[oob_df["oob_error"].idxmin()].copy() # Find minimum error
 best_n_trees = int(best_row["n_trees"]) # Extract number of trees
@@ -463,9 +466,12 @@ final_bag.fit(X_train, y_train_enc)
 
 print(f"OOB Accuracy (Final Model): {final_bag.oob_score_:.4f}")
 
-# Create test-set predictions (convert back to original string labels)
-y_pred_enc = final_bag.predict(X_test)
-y_pred     = le.inverse_transform(y_pred_enc)
+y_pred = final_bag.predict(X_test)
+
+# MAY BE ABLE TO DELETE
+# # Create test-set predictions (convert back to original string labels)
+# y_pred_enc = final_bag.predict(X_test)
+# y_pred     = le.inverse_transform(y_pred_enc)
 
 # Calculate Accuracy
 acc = accuracy_score(y_test, y_pred)
@@ -477,6 +483,7 @@ cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion
 disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order) # Generate confusion matrix
 disp.plot(cmap="Blues")
 plt.title(f"Confusion Matrix — Bagging ({best_n_trees} trees)")
+plt.savefig(f"confusion_matrix_RandomForest_best_{best_n_trees}.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 n_features = X_train.shape[1] # Set number of features
@@ -525,7 +532,7 @@ top_k = 20 # Select number fo features to use
 imp_top = imp_df.head(top_k).copy() # Create copy of data frame
 
 
-(
+g4 = (
     ggplot(imp_top, aes(x="feature", y="importance"))
     + geom_col(fill= "blue")
     + coord_flip()
@@ -538,6 +545,7 @@ imp_top = imp_df.head(top_k).copy() # Create copy of data frame
     + theme_minimal()
 )
 
+g4.save("oob_error_vs_trees.png", dpi=300)
 
 
 
@@ -1082,4 +1090,9 @@ imp_top = imp_df.head(top_k).copy() # Create copy of data frame
 # plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
 # plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
 # plt.close()
+
+
+
+
+
 
