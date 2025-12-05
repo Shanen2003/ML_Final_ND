@@ -270,7 +270,7 @@ plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent
 plt.close()
 
 # logistic regression predictions and accuracy
-logit_pred_prob = fit_3.predict(df_test[selected_features])
+logit_pred_prob = fit_3.predict(df_test[features])
 logit_pred = (logit_pred_prob >= 0.5).astype(int)
 logit_acc = accuracy_score(y_test, logit_pred)
 print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
