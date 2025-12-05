@@ -252,13 +252,32 @@ x_data = pd.DataFrame(X_scaled, columns=features)
 
 
 
+
+
+
+
+
+X_no_lasso = df_train.drop(columns=["Normal_Attack", "Timestamp"])
+constant_cols = [c for c in X_no_lasso.columns if X_no_lasso[c].nunique() <= 1]
+X_no_lasso = X_no_lasso.drop(columns=constant_cols)
+
+
+corr = X_no_lasso.corr().abs()
+
+# keep only upper triangle
+upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+high_corr = [column for column in upper.columns if any(upper[column] > 0.9999)]
+
+X_no_lasso = X_no_lasso.drop(columns=high_corr)
+
+
+features = X_no_lasso.columns
 predictors = [f'Q("{c}")' for c in features]
 formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
 
-fit_3 = smf.logit(formula = formula, data = df).fit()
-
-print(fit_3.summary())
-summary_str = fit_3.summary().as_text()
+fit_no_lasso = smf.logit(formula=formula, data=df_train).fit()
+print(fit_no_lasso.summary())
+summary_str = fit_no_lasso.summary().as_text()
 
 fig = plt.figure(figsize=(9, 7))
 fig.patch.set_alpha(0)     
@@ -270,7 +289,7 @@ plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent
 plt.close()
 
 # logistic regression predictions and accuracy
-logit_pred_prob = fit_3.predict(df_test[features])
+logit_pred_prob = fit_no_lasso.predict(df_test[features])
 logit_pred = (logit_pred_prob >= 0.5).astype(int)
 logit_acc = accuracy_score(y_test, logit_pred)
 print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
@@ -321,7 +340,7 @@ selected_features = coef_series[coef_series != 0].index.tolist()
 predictors = [f'Q("{c}")' for c in selected_features]
 formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
 
-fit_3 = smf.logit(formula = formula, data = df).fit()
+fit_3 = smf.logit(formula = formula, data = df_train).fit()
 
 print(fit_3.summary())
 summary_str = fit_3.summary().as_text()
