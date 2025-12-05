@@ -225,6 +225,7 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
+df.shape()
 
 
 
@@ -232,320 +233,330 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
-
-
-# # Logistic Regression with Lasso
+# Logistic Regression with Lasso
 
 
 
-# # df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
-# y = df_train["Normal_Attack"].to_numpy()
-# X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
+# df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
+y = df_train["Normal_Attack"].to_numpy()
+X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
 
-# scaler = StandardScaler()
-# X_scaled = scaler.fit_transform(X)
-# features = X.columns
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+features = X.columns
 
-# x_data = pd.DataFrame(X_scaled, columns=features)
+x_data = pd.DataFrame(X_scaled, columns=features)
 
 
-# # # Manually Select Lasso Alpha
-# # lasso = Lasso(alpha=0.15, fit_intercept=True, max_iter=10000)
-# # lasso.fit(X_scaled, y)
-
-# # Or allow Cross-Validation to select Lasso Alpha
-# lambda_seq = np.arange(0.1, 10.0 + 1e-12, 0.1)
-# cv_model = LassoCV(alphas=lambda_seq, cv=10, fit_intercept=True, max_iter=10000)
-# cv_model.fit(X_scaled, y)
-# alpha_min = cv_model.alpha_
-# lasso = Lasso(alpha=alpha_min, fit_intercept=True, max_iter=10000)
+# # Manually Select Lasso Alpha
+# lasso = Lasso(alpha=0.15, fit_intercept=True, max_iter=10000)
 # lasso.fit(X_scaled, y)
 
-
-# # OLS Regression with Lasso
-# coef_series = pd.Series(lasso.coef_, index=features, name="coef")
-# coef_df = coef_series.reset_index()
-
-# selected_features = coef_series[coef_series != 0].index.tolist()
-
-# predictors = [f'Q("{c}")' for c in selected_features]
-# formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
-
-# fit_3 = smf.logit(formula = formula, data = df).fit()
-
-# print(fit_3.summary())
-# summary_str = fit_3.summary().as_text()
-
-# fig = plt.figure(figsize=(9, 7))
-# fig.patch.set_alpha(0)     
-# plt.axis('off')
-
-# plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
-
-# plt.savefig("C:/Users/shane/Downloads/Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
-# plt.close()
-
-# # logistic regression predictions and accuracy
-# logit_pred_prob = fit_3.predict(df_test[selected_features])
-# logit_pred = (logit_pred_prob >= 0.5).astype(int)
-# logit_acc = accuracy_score(y_test, logit_pred)
-# print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
+# Or allow Cross-Validation to select Lasso Alpha
+lambda_seq = np.arange(0.1, 10.0 + 1e-12, 0.1)
+cv_model = LassoCV(alphas=lambda_seq, cv=10, fit_intercept=True, max_iter=10000)
+cv_model.fit(X_scaled, y)
+alpha_min = cv_model.alpha_
+lasso = Lasso(alpha=alpha_min, fit_intercept=True, max_iter=10000)
+lasso.fit(X_scaled, y)
 
 
+# OLS Regression with Lasso
+coef_series = pd.Series(lasso.coef_, index=features, name="coef")
+coef_df = coef_series.reset_index()
 
+selected_features = coef_series[coef_series != 0].index.tolist()
 
+predictors = [f'Q("{c}")' for c in selected_features]
+formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
 
+fit_3 = smf.logit(formula = formula, data = df).fit()
 
+print(fit_3.summary())
+summary_str = fit_3.summary().as_text()
 
+fig = plt.figure(figsize=(9, 7))
+fig.patch.set_alpha(0)     
+plt.axis('off')
 
+plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
 
+plt.savefig("C:/Users/shane/Downloads/Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
+plt.close()
 
+# logistic regression predictions and accuracy
+logit_pred_prob = fit_3.predict(df_test[selected_features])
+logit_pred = (logit_pred_prob >= 0.5).astype(int)
+logit_acc = accuracy_score(y_test, logit_pred)
+print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
 
 
 
+# Confusion matrix for Logistic Regression
+cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
 
-
-
-
-
-# Bagging and random forest 
-
-# Decision Tree
-
-train_mask = ~X_train.isna().any(axis=1)
-X_train = X_train[train_mask]
-y_train = y_train[train_mask]
-
-test_mask = ~X_test.isna().any(axis=1)
-X_test = X_test[test_mask]
-y_test = y_test[test_mask]
-
-tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
-tree_model.fit(X_train, y_train) # Fit tree
-
-# Encode labels for visualziation
-le = preprocessing.LabelEncoder()
-y_train_enc = le.fit_transform(y_train)
-
-# Set up visualization
-viz_model = dtreeviz.model(
-    tree_model,
-    X_train=X_train,
-    y_train=y_train_enc,
-    feature_names=list(X_train.columns),
-    target_name="outcome",
-    class_names=[str(c) for c in le.classes_]
-)
-v = viz_model.view(fontname="DejaVu Sans")
-v.save("decision_tree_viz.svg") # Save visualization
-
-y_pred = tree_model.predict(X_test)
-acc = accuracy_score(y_test, y_pred)
-# y_pred_enc = tree_model.predict(X_test) # Create predictions
-# y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
-acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
-print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
-
-cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Decision Tree") # Set title
-plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
-plt.show() # Display plot
-
-
-
-
-
-##HOW TO SAVE
-##plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-##plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
-##plt.close()
-
-
-
-
-#BAGGING
-
-base_tree = DecisionTreeClassifier(random_state=123)
-bag_model = BaggingClassifier(
-    estimator=base_tree,
-    n_estimators=300,        # number of trees
-    max_samples=1.0,         # bootstrap sample size (fraction of training set)
-    max_features=1.0,        # use all features per base estimator
-    bootstrap=True,          # sample rows with replacement
-    bootstrap_features=False,# do not bootstrap features
-    oob_score=True,          # get OOB estimate
-    n_jobs=-1,               # use all cores
-    random_state=123
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_logit,
+    display_labels=["Normal", "Attack"]  # class names for 0 and 1
 )
 
-bag_model.fit(X_train, y_train)
-
-y_pred = bag_model.predict(X_test)
-
-# Delete if runs
-# y_pred_enc = bag_model.predict(X_test) # Create predictions
-# y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
-
-acc = accuracy_score(y_test, y_pred)
-print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
-
-labels_in_order = list(le.classes_)  # ensure consistent label order
-cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
-
-# Generate confusion matrix
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
-disp.plot(cmap="Blues") # Set colors
-plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
-plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
-plt.show() # Display plot
-
-
-
-# Random Forest 
-
-## Be careful this can take some time to run ##
-# Set range of values to try
-n_trees_range = range(50, 501, 50)   # from 50 to 500 in steps of 50
-oob_errors = [] # Create list to store results
-
-# For each number of trees
-for n_trees in n_trees_range:
-    bag_model = BaggingClassifier( # Set up model
-        estimator=DecisionTreeClassifier(random_state=123),
-        n_estimators=n_trees, # Set number of trees
-        oob_score=True,
-        n_jobs=-1,
-        random_state=123
-    )
-    bag_model.fit(X_train, y_train_enc) # Fit model
-    oob_error = 1 - bag_model.oob_score_ # Calculate error
-    oob_errors.append((n_trees, oob_error)) # Store number of trees and error
-
-# Create data frame
-oob_df = pd.DataFrame(oob_errors, columns=["n_trees", "oob_error"])
-
-g_1 =(
-    ggplot(oob_df, # Set data
-           aes(x="n_trees", y="oob_error")) # Set X and y
-    + geom_line(color="blue") # Set line
-    + geom_point(color="red") # Set scatter plot
-    + labs(
-        title="OOB Error vs Number of Trees (Bagging)",
-        x="Number of Trees",
-        y="OOB Error"
-    )
-    + theme_minimal() # Set theme
-    + theme(
-        panel_grid_major=element_blank(),  # Turn off background grid
-        panel_grid_minor=element_blank(),
-        panel_border=element_blank(),
-        panel_background=element_blank()
-    )
-)
-
-g_1.save("oob_error_vs_trees.png", dpi=300)
-
-
-best_row = oob_df.loc[oob_df["oob_error"].idxmin()].copy() # Find minimum error
-best_n_trees = int(best_row["n_trees"]) # Extract number of trees
-best_oob_error = float(best_row["oob_error"]) # Identify error
-print(f"Selected n_trees = {best_n_trees} with OOB Error = {best_oob_error:.4f}") # Print result
-
-# Fit Bagging model with optimal number of trees
-final_bag = BaggingClassifier(
-    estimator=DecisionTreeClassifier(random_state=123), # Set type of estimator
-    n_estimators=best_n_trees, # Set number of trees
-    oob_score=True, # Calculate OOB error
-    n_jobs=-1, # Run on max number of cores
-    random_state=123 # Set seed
-)
-# Fit model
-final_bag.fit(X_train, y_train_enc)
-
-print(f"OOB Accuracy (Final Model): {final_bag.oob_score_:.4f}")
-
-y_pred = final_bag.predict(X_test)
-
-# MAY BE ABLE TO DELETE
-# # Create test-set predictions (convert back to original string labels)
-# y_pred_enc = final_bag.predict(X_test)
-# y_pred     = le.inverse_transform(y_pred_enc)
-
-# Calculate Accuracy
-acc = accuracy_score(y_test, y_pred)
-print(f"Bagging (Final, {best_n_trees} trees) Accuracy on Test Set: {acc:.4f}")
-
-labels_in_order = list(le.classes_)  # preserves label order (e.g., ['Loss','Win'])
-cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
-
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order) # Generate confusion matrix
 disp.plot(cmap="Blues")
-plt.title(f"Confusion Matrix — Bagging ({best_n_trees} trees)")
-plt.savefig(f"confusion_matrix_RandomForest_best_{best_n_trees}.png", dpi=300, bbox_inches="tight")
+plt.title("Confusion Matrix — Logistic Regression with Lasso")
+plt.savefig("Confusion Matrix — Logistic Regression with Lasso.png",
+            dpi=300, bbox_inches="tight")
 plt.show()
 
-n_features = X_train.shape[1] # Set number of features
-global_importance = np.zeros(n_features, dtype=float) # Create vector of zeros
-
-# If feature sub-sampling were enabled (bootstrap_features=True or max_features<1.0),
-# BaggingClassifier exposes `estimators_features_` to map local → global feature indices.
-has_feature_subsampling = hasattr(final_bag, "estimators_features_") and final_bag.estimators_features_ is not None
-
-num_used_estimators = 0 # Start at 0
-for i, est in enumerate(final_bag.estimators_): # For each model
-    if not hasattr(est, "feature_importances_"):
-        # If a base estimator lacks feature_importances_, skip it (shouldn't happen with DecisionTree)
-        continue
-
-    fi = est.feature_importances_ # Extract feature importance
-    if has_feature_subsampling:
-        # Map local importances back to global columns
-        feats_idx = final_bag.estimators_features_[i]
-        tmp = np.zeros(n_features, dtype=float)
-        tmp[feats_idx] = fi
-        global_importance += tmp
-    else:
-        # No sub-sampling → same feature space for all estimators
-        global_importance += fi
-
-    num_used_estimators += 1 # Increment number of estimators
-
-# Average across estimators
-if num_used_estimators > 0:
-    global_importance /= num_used_estimators
-else:
-    raise RuntimeError("No usable base estimators with feature_importances_.")
-
-# Build tidy DataFrame
-imp_df = (
-    pd.DataFrame({
-        "feature": X_train.columns,
-        "importance": global_importance
-    })
-    .sort_values("importance", ascending=False)
-    .reset_index(drop=True)
-)
-
-top_k = 20 # Select number fo features to use
-imp_top = imp_df.head(top_k).copy() # Create copy of data frame
 
 
-g4 = (
-    ggplot(imp_top, aes(x="feature", y="importance"))
-    + geom_col(fill= "blue")
-    + coord_flip()
-    + scale_y_continuous(expand=(0.0, 0.0))
-    + labs(
-        title=f"Variable Importance — Bagging (Top {top_k})",
-        x="Feature",
-        y="Mean Importance (across trees)"
-    )
-    + theme_minimal()
-)
 
-g4.save("oob_error_vs_trees.png", dpi=300)
+
+
+
+
+
+
+
+
+
+
+# # Bagging and random forest 
+
+# # Decision Tree
+
+# train_mask = ~X_train.isna().any(axis=1)
+# X_train = X_train[train_mask]
+# y_train = y_train[train_mask]
+
+# test_mask = ~X_test.isna().any(axis=1)
+# X_test = X_test[test_mask]
+# y_test = y_test[test_mask]
+
+# tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
+# tree_model.fit(X_train, y_train) # Fit tree
+
+# # Encode labels for visualziation
+# le = preprocessing.LabelEncoder()
+# y_train_enc = le.fit_transform(y_train)
+
+# # Set up visualization
+# viz_model = dtreeviz.model(
+#     tree_model,
+#     X_train=X_train,
+#     y_train=y_train_enc,
+#     feature_names=list(X_train.columns),
+#     target_name="outcome",
+#     class_names=[str(c) for c in le.classes_]
+# )
+# v = viz_model.view(fontname="DejaVu Sans")
+# v.save("decision_tree_viz.svg") # Save visualization
+
+# y_pred = tree_model.predict(X_test)
+# acc = accuracy_score(y_test, y_pred)
+# # y_pred_enc = tree_model.predict(X_test) # Create predictions
+# # y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
+# acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
+# print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
+
+# cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Decision Tree") # Set title
+# plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
+# plt.show() # Display plot
+
+
+
+
+
+# ##HOW TO SAVE
+# ##plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+# ##plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
+# ##plt.close()
+
+
+
+
+# #BAGGING
+
+# base_tree = DecisionTreeClassifier(random_state=123)
+# bag_model = BaggingClassifier(
+#     estimator=base_tree,
+#     n_estimators=300,        # number of trees
+#     max_samples=1.0,         # bootstrap sample size (fraction of training set)
+#     max_features=1.0,        # use all features per base estimator
+#     bootstrap=True,          # sample rows with replacement
+#     bootstrap_features=False,# do not bootstrap features
+#     oob_score=True,          # get OOB estimate
+#     n_jobs=-1,               # use all cores
+#     random_state=123
+# )
+
+# bag_model.fit(X_train, y_train)
+
+# y_pred = bag_model.predict(X_test)
+
+# # Delete if runs
+# # y_pred_enc = bag_model.predict(X_test) # Create predictions
+# # y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
+
+# acc = accuracy_score(y_test, y_pred)
+# print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
+
+# labels_in_order = list(le.classes_)  # ensure consistent label order
+# cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
+
+# # Generate confusion matrix
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
+# disp.plot(cmap="Blues") # Set colors
+# plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
+# plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
+# plt.show() # Display plot
+
+
+
+# # Random Forest 
+
+# ## Be careful this can take some time to run ##
+# # Set range of values to try
+# n_trees_range = range(50, 501, 50)   # from 50 to 500 in steps of 50
+# oob_errors = [] # Create list to store results
+
+# # For each number of trees
+# for n_trees in n_trees_range:
+#     bag_model = BaggingClassifier( # Set up model
+#         estimator=DecisionTreeClassifier(random_state=123),
+#         n_estimators=n_trees, # Set number of trees
+#         oob_score=True,
+#         n_jobs=-1,
+#         random_state=123
+#     )
+#     bag_model.fit(X_train, y_train_enc) # Fit model
+#     oob_error = 1 - bag_model.oob_score_ # Calculate error
+#     oob_errors.append((n_trees, oob_error)) # Store number of trees and error
+
+# # Create data frame
+# oob_df = pd.DataFrame(oob_errors, columns=["n_trees", "oob_error"])
+
+# g_1 =(
+#     ggplot(oob_df, # Set data
+#            aes(x="n_trees", y="oob_error")) # Set X and y
+#     + geom_line(color="blue") # Set line
+#     + geom_point(color="red") # Set scatter plot
+#     + labs(
+#         title="OOB Error vs Number of Trees (Bagging)",
+#         x="Number of Trees",
+#         y="OOB Error"
+#     )
+#     + theme_minimal() # Set theme
+#     + theme(
+#         panel_grid_major=element_blank(),  # Turn off background grid
+#         panel_grid_minor=element_blank(),
+#         panel_border=element_blank(),
+#         panel_background=element_blank()
+#     )
+# )
+
+# g_1.save("oob_error_vs_trees.png", dpi=300)
+
+
+# best_row = oob_df.loc[oob_df["oob_error"].idxmin()].copy() # Find minimum error
+# best_n_trees = int(best_row["n_trees"]) # Extract number of trees
+# best_oob_error = float(best_row["oob_error"]) # Identify error
+# print(f"Selected n_trees = {best_n_trees} with OOB Error = {best_oob_error:.4f}") # Print result
+
+# # Fit Bagging model with optimal number of trees
+# final_bag = BaggingClassifier(
+#     estimator=DecisionTreeClassifier(random_state=123), # Set type of estimator
+#     n_estimators=best_n_trees, # Set number of trees
+#     oob_score=True, # Calculate OOB error
+#     n_jobs=-1, # Run on max number of cores
+#     random_state=123 # Set seed
+# )
+# # Fit model
+# final_bag.fit(X_train, y_train_enc)
+
+# print(f"OOB Accuracy (Final Model): {final_bag.oob_score_:.4f}")
+
+# y_pred = final_bag.predict(X_test)
+
+# # MAY BE ABLE TO DELETE
+# # # Create test-set predictions (convert back to original string labels)
+# # y_pred_enc = final_bag.predict(X_test)
+# # y_pred     = le.inverse_transform(y_pred_enc)
+
+# # Calculate Accuracy
+# acc = accuracy_score(y_test, y_pred)
+# print(f"Bagging (Final, {best_n_trees} trees) Accuracy on Test Set: {acc:.4f}")
+
+# labels_in_order = list(le.classes_)  # preserves label order (e.g., ['Loss','Win'])
+# cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
+
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order) # Generate confusion matrix
+# disp.plot(cmap="Blues")
+# plt.title(f"Confusion Matrix — Bagging ({best_n_trees} trees)")
+# plt.savefig(f"confusion_matrix_RandomForest_best_{best_n_trees}.png", dpi=300, bbox_inches="tight")
+# plt.show()
+
+# n_features = X_train.shape[1] # Set number of features
+# global_importance = np.zeros(n_features, dtype=float) # Create vector of zeros
+
+# # If feature sub-sampling were enabled (bootstrap_features=True or max_features<1.0),
+# # BaggingClassifier exposes `estimators_features_` to map local → global feature indices.
+# has_feature_subsampling = hasattr(final_bag, "estimators_features_") and final_bag.estimators_features_ is not None
+
+# num_used_estimators = 0 # Start at 0
+# for i, est in enumerate(final_bag.estimators_): # For each model
+#     if not hasattr(est, "feature_importances_"):
+#         # If a base estimator lacks feature_importances_, skip it (shouldn't happen with DecisionTree)
+#         continue
+
+#     fi = est.feature_importances_ # Extract feature importance
+#     if has_feature_subsampling:
+#         # Map local importances back to global columns
+#         feats_idx = final_bag.estimators_features_[i]
+#         tmp = np.zeros(n_features, dtype=float)
+#         tmp[feats_idx] = fi
+#         global_importance += tmp
+#     else:
+#         # No sub-sampling → same feature space for all estimators
+#         global_importance += fi
+
+#     num_used_estimators += 1 # Increment number of estimators
+
+# # Average across estimators
+# if num_used_estimators > 0:
+#     global_importance /= num_used_estimators
+# else:
+#     raise RuntimeError("No usable base estimators with feature_importances_.")
+
+# # Build tidy DataFrame
+# imp_df = (
+#     pd.DataFrame({
+#         "feature": X_train.columns,
+#         "importance": global_importance
+#     })
+#     .sort_values("importance", ascending=False)
+#     .reset_index(drop=True)
+# )
+
+# top_k = 20 # Select number fo features to use
+# imp_top = imp_df.head(top_k).copy() # Create copy of data frame
+
+
+# g4 = (
+#     ggplot(imp_top, aes(x="feature", y="importance"))
+#     + geom_col(fill= "blue")
+#     + coord_flip()
+#     + scale_y_continuous(expand=(0.0, 0.0))
+#     + labs(
+#         title=f"Variable Importance — Bagging (Top {top_k})",
+#         x="Feature",
+#         y="Mean Importance (across trees)"
+#     )
+#     + theme_minimal()
+# )
+
+# g4.save("oob_error_vs_trees.png", dpi=300)
 
 
 
