@@ -215,11 +215,11 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
-
+df['Normal_Attack'] = df['Normal_Attack'].map({0 : 'Normal', 1 : 'Attack'})
 
 
 AIT402 = (
-    ggplot(df, aes(x="Normal_Attack", y="AIT402")) 
+    ggplot(df, aes(x="Normal_Attack", y="AIT402", fill = "Normal_Attack")) 
     + geom_boxplot()  
     + theme_bw()  
     + theme(
@@ -239,6 +239,35 @@ AIT402.save("AIT402_Boxplot.png", dpi=300, width=6, height=4)
 
 
 
+df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
+
+
+
+
+
+
+
+
+
+
+
+
+#Example
+
+# Dummy predictions: treat everything as Normal (0)
+y_dummy = np.zeros_like(y_test)
+
+# Confusion matrix
+cm_dummy = confusion_matrix(y_test, y_dummy, labels=[0, 1])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_dummy, display_labels=["Normal", "Attack"])
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix — Predict All Normal (0)")
+plt.savefig("Confusion Matrix 0.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Accuracy
+acc_dummy = accuracy_score(y_test, y_dummy)
+print("Accuracy (predict all Normal):", acc_dummy)
 
 
 
