@@ -1178,7 +1178,7 @@ test_pred_w = xgb_tuned.predict(dtest) # Create predictions
 
 
 # Convert predictions into classes at 0.5
-test_pred_cls_w = (test_pred_w >= 0.4).astype(int)
+test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
 
 
 print("\nConfusion matrix:")
@@ -1190,6 +1190,42 @@ plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tig
 plt.close()
 print("\nAccuracy):")
 print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
+# Convert predictions into classes at 0.5
+test_pred_cls_w = (test_pred_w >= 0.11).astype(int)
+
+
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls_w))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.savefig("confusion_matrix_weighted_and_tuned_11.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
+
+# Convert predictions into classes at 0.5
+test_pred_cls_w = (test_pred_w >= 0.115).astype(int)
+
+
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls_w))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.savefig("confusion_matrix_weighted_and_tuned_115.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
 
 
 # # SHAP values to see importance of each column in the weighted tuned XGBoost model
