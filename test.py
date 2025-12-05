@@ -33,6 +33,8 @@ from sklearn.ensemble import BaggingClassifier
 
 df = pd.read_csv('merged.csv')
 
+print(df.shape)
+
 df = df.rename(columns = { ' Timestamp' : 'Timestamp' })
 
 df['Timestamp'] = pd.to_datetime(df['Timestamp'], dayfirst = True, format='mixed')
@@ -225,7 +227,6 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
-df.shape()
 
 
 
@@ -281,7 +282,7 @@ plt.axis('off')
 
 plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
 
-plt.savefig("C:/Users/shane/Downloads/Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
+plt.savefig("Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
 plt.close()
 
 # logistic regression predictions and accuracy
