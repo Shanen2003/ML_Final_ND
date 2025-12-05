@@ -249,6 +249,56 @@ features = X.columns
 x_data = pd.DataFrame(X_scaled, columns=features)
 
 
+
+
+
+predictors = [f'Q("{c}")' for c in features]
+formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
+
+fit_3 = smf.logit(formula = formula, data = df).fit()
+
+print(fit_3.summary())
+summary_str = fit_3.summary().as_text()
+
+fig = plt.figure(figsize=(9, 7))
+fig.patch.set_alpha(0)     
+plt.axis('off')
+
+plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
+
+plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent=True)
+plt.close()
+
+# logistic regression predictions and accuracy
+logit_pred_prob = fit_3.predict(df_test[selected_features])
+logit_pred = (logit_pred_prob >= 0.5).astype(int)
+logit_acc = accuracy_score(y_test, logit_pred)
+print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
+
+
+
+# Confusion matrix for Logistic Regression
+cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_logit,
+    display_labels=["Normal", "Attack"]  # class names for 0 and 1
+)
+
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix — Logistic Regression")
+plt.savefig("Confusion Matrix — Logistic Regression.png",
+            dpi=300, bbox_inches="tight")
+plt.show()
+
+
+
+
+
+
+
+
+
 # # Manually Select Lasso Alpha
 # lasso = Lasso(alpha=0.15, fit_intercept=True, max_iter=10000)
 # lasso.fit(X_scaled, y)
