@@ -105,51 +105,51 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
-# # #Point Biserial Correlation
+# #Point Biserial Correlation
 
-# #Setting up X and Y, then getting point biserial in a dictionary
+#Setting up X and Y, then getting point biserial in a dictionary
 
-# y = df['Normal_Attack']
-# x = df.drop(columns = ['Timestamp', 'Normal_Attack'])
+y = df['Normal_Attack']
+x = df.drop(columns = ['Timestamp', 'Normal_Attack'])
 
 
-# x.dtypes
-# y.dtypes
+x.dtypes
+y.dtypes
 
-# results = {}
+results = {}
 
-# for col in x.columns:
-#     results['correlation_' + str(col)] = pointbiserialr(y, x[col])
+for col in x.columns:
+    results['correlation_' + str(col)] = pointbiserialr(y, x[col])
 
-# # print(results) Ignore this this was to make sure the loop worked
+# print(results) Ignore this this was to make sure the loop worked
 
-# # Dictionary to to DataFrame, renaming, and dropping some useless rows
-# df = pd.DataFrame.from_dict(results, orient='index')
-# df = df.rename(columns={'statistic': 'r', 'pvalue': 'p'})
+# Dictionary to to DataFrame, renaming, and dropping some useless rows
+df = pd.DataFrame.from_dict(results, orient='index')
+df = df.rename(columns={'statistic': 'r', 'pvalue': 'p'})
 
-# # df
+# df
 
-# df.index = df.index.str.replace('correlation_', '', regex=False).str.strip()
+df.index = df.index.str.replace('correlation_', '', regex=False).str.strip()
 
-# df = df.dropna(subset=['r'])
+df = df.dropna(subset=['r'])
 
-# # df.head()
+# df.head()
 
-# #Actual Plot (of the top 10)
-# topN = 10
-# df_sorted = df.reindex(df['r'].sort_values(ascending=False).index)
+#Actual Plot (of the top 10)
+topN = 10
+df_sorted = df.reindex(df['r'].sort_values(ascending=False).index)
 
-# plt.figure(figsize=(8, 10))
-# df_sorted['r'].head(topN).iloc[::-1].plot(kind='barh')
-# plt.xlabel('Point-biserial r (Attack = 1)')
-# plt.title(f'Top {topN} Features by Attack Correlation')
-# plt.tight_layout()
-# plt.savefig("Point Biserial-R", dpi=300, bbox_inches="tight")
-# plt.close()
+plt.figure(figsize=(8, 10))
+df_sorted['r'].head(topN).iloc[::-1].plot(kind='barh')
+plt.xlabel('Point-biserial r (Attack = 1)')
+plt.title(f'Top {topN} Features by Attack Correlation')
+plt.tight_layout()
+plt.savefig("Point Biserial-R", dpi=300, bbox_inches="tight")
+plt.close()
 
 # # #
 
-# # # # Some box plots of the top 3
+# # # # Some box plots
 
 # # # AIT402 = (
 # # #     ggplot(data, aes(x="Normal_Attack", y="AIT402")) 
@@ -289,45 +289,22 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 
 
 
-# #Example
+#Example
 
-# # Dummy predictions: treat everything as Normal (0)
-# y_dummy = np.zeros_like(y_test)
+# Dummy predictions: treat everything as Normal (0)
+y_dummy = np.zeros_like(y_test)
 
-# # Confusion matrix
-# cm_dummy = confusion_matrix(y_test, y_dummy, labels=[0, 1])
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm_dummy, display_labels=["Normal", "Attack"])
-# disp.plot(cmap="Blues")
-# plt.title("Confusion Matrix — Predict All Normal (0)")
-# plt.savefig("Confusion Matrix 0.png", dpi=300, bbox_inches="tight")
-# plt.show()
+# Confusion matrix
+cm_dummy = confusion_matrix(y_test, y_dummy, labels=[0, 1])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_dummy, display_labels=["Normal", "Attack"])
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix — Predict All Normal (0)")
+plt.savefig("Confusion Matrix 0.png", dpi=300, bbox_inches="tight")
+plt.show()
 
-# # Accuracy
-# acc_dummy = accuracy_score(y_test, y_dummy)
-# print("Accuracy (predict all Normal):", acc_dummy)
-
-
-
-
-
-
-
-
-
-
-# # Logistic Regression with Lasso
-
-
-
-# # df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
-# y = df_train["Normal_Attack"].to_numpy()
-# X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
-
-# scaler = StandardScaler()
-# X_scaled = scaler.fit_transform(X)
-# features = X.columns
-
-# x_data = pd.DataFrame(X_scaled, columns=features)
+# Accuracy
+acc_dummy = accuracy_score(y_test, y_dummy)
+print("Accuracy (predict all Normal):", acc_dummy)
 
 
 
@@ -337,54 +314,77 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 
 
 
-# # Manually Select Lasso Alpha
-# lasso = Lasso(alpha=0.01, fit_intercept=True, max_iter=10000)
-# lasso.fit(X_scaled, y)
+
+# Logistic Regression with Lasso
 
 
-# # OLS Regression with Lasso
-# coef_series = pd.Series(lasso.coef_, index=features, name="coef")
-# coef_df = coef_series.reset_index()
 
-# selected_features = coef_series[coef_series != 0].index.tolist()
+# df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
+y = df_train["Normal_Attack"].to_numpy()
+X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
 
-# predictors = [f'Q("{c}")' for c in selected_features]
-# formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+features = X.columns
 
-# fit_3 = smf.logit(formula = formula, data = df_train).fit()
-
-# print(fit_3.summary())
-# summary_str = fit_3.summary().as_text()
-
-# fig = plt.figure(figsize=(9, 7))
-# fig.patch.set_alpha(0)     
-# plt.axis('off')
-
-# plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
-
-# plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent=True)
-# plt.close()
-
-# # logistic regression predictions and accuracy
-# logit_pred_prob = fit_3.predict(df_test[selected_features])
-# logit_pred = (logit_pred_prob >= 0.5).astype(int)
-# logit_acc = accuracy_score(y_test, logit_pred)
-# print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
+x_data = pd.DataFrame(X_scaled, columns=features)
 
 
-# # Confusion matrix for Logistic Regression
-# cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
 
-# disp = ConfusionMatrixDisplay(
-#     confusion_matrix=cm_logit,
-#     display_labels=["Normal", "Attack"]  # class names for 0 and 1
-# )
 
-# disp.plot(cmap="Blues")
-# plt.title("Confusion Matrix — Logistic Regression")
-# plt.savefig("Confusion Matrix — Logistic Regression.png",
-#             dpi=300, bbox_inches="tight")
-# plt.show()
+
+
+
+
+
+# Manually Select Lasso Alpha
+lasso = Lasso(alpha=0.01, fit_intercept=True, max_iter=10000)
+lasso.fit(X_scaled, y)
+
+
+# OLS Regression with Lasso
+coef_series = pd.Series(lasso.coef_, index=features, name="coef")
+coef_df = coef_series.reset_index()
+
+selected_features = coef_series[coef_series != 0].index.tolist()
+
+predictors = [f'Q("{c}")' for c in selected_features]
+formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
+
+fit_3 = smf.logit(formula = formula, data = df_train).fit()
+
+print(fit_3.summary())
+summary_str = fit_3.summary().as_text()
+
+fig = plt.figure(figsize=(9, 7))
+fig.patch.set_alpha(0)     
+plt.axis('off')
+
+plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
+
+plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent=True)
+plt.close()
+
+# logistic regression predictions and accuracy
+logit_pred_prob = fit_3.predict(df_test[selected_features])
+logit_pred = (logit_pred_prob >= 0.5).astype(int)
+logit_acc = accuracy_score(y_test, logit_pred)
+print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
+
+
+# Confusion matrix for Logistic Regression
+cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_logit,
+    display_labels=["Normal", "Attack"]  # class names for 0 and 1
+)
+
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix — Logistic Regression")
+plt.savefig("Confusion Matrix — Logistic Regression.png",
+            dpi=300, bbox_inches="tight")
+plt.show()
 
 
 
@@ -398,62 +398,59 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 # # lasso = Lasso(alpha=0.15, fit_intercept=True, max_iter=10000)
 # # lasso.fit(X_scaled, y)
 
-# # Or allow Cross-Validation to select Lasso Alpha
-# lambda_seq = np.arange(0.1, 10.0 + 1e-12, 0.1)
-# cv_model = LassoCV(alphas=lambda_seq, cv=10, fit_intercept=True, max_iter=10000)
-# cv_model.fit(X_scaled, y)
-# alpha_min = cv_model.alpha_
-# lasso = Lasso(alpha=alpha_min, fit_intercept=True, max_iter=10000)
-# lasso.fit(X_scaled, y)
+# Or allow Cross-Validation to select Lasso Alpha
+lambda_seq = np.arange(0.1, 10.0 + 1e-12, 0.1)
+cv_model = LassoCV(alphas=lambda_seq, cv=10, fit_intercept=True, max_iter=10000)
+cv_model.fit(X_scaled, y)
+alpha_min = cv_model.alpha_
+lasso = Lasso(alpha=alpha_min, fit_intercept=True, max_iter=10000)
+lasso.fit(X_scaled, y)
 
 
-# # OLS Regression with Lasso
-# coef_series = pd.Series(lasso.coef_, index=features, name="coef")
-# coef_df = coef_series.reset_index()
+# OLS Regression with Lasso
+coef_series = pd.Series(lasso.coef_, index=features, name="coef")
+coef_df = coef_series.reset_index()
 
-# selected_features = coef_series[coef_series != 0].index.tolist()
+selected_features = coef_series[coef_series != 0].index.tolist()
 
-# predictors = [f'Q("{c}")' for c in selected_features]
-# formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
+predictors = [f'Q("{c}")' for c in selected_features]
+formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
 
-# fit_3 = smf.logit(formula = formula, data = df_train).fit()
+fit_3 = smf.logit(formula = formula, data = df_train).fit()
 
-# print(fit_3.summary())
-# summary_str = fit_3.summary().as_text()
+print(fit_3.summary())
+summary_str = fit_3.summary().as_text()
 
-# fig = plt.figure(figsize=(9, 7))
-# fig.patch.set_alpha(0)     
-# plt.axis('off')
+fig = plt.figure(figsize=(9, 7))
+fig.patch.set_alpha(0)     
+plt.axis('off')
 
-# plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
+plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
 
-# plt.savefig("Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
-# plt.close()
+plt.savefig("Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
+plt.close()
 
-# # logistic regression predictions and accuracy
-# logit_pred_prob = fit_3.predict(df_test[selected_features])
-# logit_pred = (logit_pred_prob >= 0.5).astype(int)
-# logit_acc = accuracy_score(y_test, logit_pred)
-# print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
-
-
-
-# # Confusion matrix for Logistic Regression
-# cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
-
-# disp = ConfusionMatrixDisplay(
-#     confusion_matrix=cm_logit,
-#     display_labels=["Normal", "Attack"]  # class names for 0 and 1
-# )
-
-# disp.plot(cmap="Blues")
-# plt.title("Confusion Matrix — Logistic Regression with Lasso")
-# plt.savefig("Confusion Matrix — Logistic Regression with Lasso.png",
-#             dpi=300, bbox_inches="tight")
-# plt.show()
+# logistic regression predictions and accuracy
+logit_pred_prob = fit_3.predict(df_test[selected_features])
+logit_pred = (logit_pred_prob >= 0.5).astype(int)
+logit_acc = accuracy_score(y_test, logit_pred)
+print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
 
 
 
+# Confusion matrix for Logistic Regression
+cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_logit,
+    display_labels=["Normal", "Attack"]  # class names for 0 and 1
+)
+
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix — Logistic Regression with Lasso")
+plt.savefig("Confusion Matrix — Logistic Regression with Lasso.png",
+            dpi=300, bbox_inches="tight")
+plt.show()
 
 
 
@@ -465,104 +462,101 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 
 
 
-# # Bagging and random forest 
-
-# # Decision Tree
-
-# train_mask = ~X_train.isna().any(axis=1)
-# X_train = X_train[train_mask]
-# y_train = y_train[train_mask]
-
-# test_mask = ~X_test.isna().any(axis=1)
-# X_test = X_test[test_mask]
-# y_test = y_test[test_mask]
-
-# tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
-# tree_model.fit(X_train, y_train) # Fit tree
-
-# # Encode labels for visualziation
-# le = preprocessing.LabelEncoder()
-# y_train_enc = le.fit_transform(y_train)
-
-# # Set up visualization
-# viz_model = dtreeviz.model(
-#     tree_model,
-#     X_train=X_train,
-#     y_train=y_train_enc,
-#     feature_names=list(X_train.columns),
-#     target_name="outcome",
-#     class_names=[str(c) for c in le.classes_]
-# )
-# v = viz_model.view(fontname="DejaVu Sans")
-# v.save("decision_tree_viz.svg") # Save visualization
-
-# y_pred = tree_model.predict(X_test)
-# acc = accuracy_score(y_test, y_pred)
-# # y_pred_enc = tree_model.predict(X_test) # Create predictions
-# # y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
-# acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
-# print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
-
-# cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
-# disp.plot(cmap="Blues") # Set color map
-# plt.title("Confusion Matrix — Decision Tree") # Set title
-# plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
-# plt.show() # Display plot
 
 
 
+# Bagging and random forest 
 
+# Decision Tree
 
-# ##HOW TO SAVE
-# ##plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-# ##plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
-# ##plt.close()
+train_mask = ~X_train.isna().any(axis=1)
+X_train = X_train[train_mask]
+y_train = y_train[train_mask]
+
+test_mask = ~X_test.isna().any(axis=1)
+X_test = X_test[test_mask]
+y_test = y_test[test_mask]
+
+tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
+tree_model.fit(X_train, y_train) # Fit tree
+
+# Encode labels for visualziation
+le = preprocessing.LabelEncoder()
+y_train_enc = le.fit_transform(y_train)
+
+# Set up visualization
+viz_model = dtreeviz.model(
+    tree_model,
+    X_train=X_train,
+    y_train=y_train_enc,
+    feature_names=list(X_train.columns),
+    target_name="outcome",
+    class_names=[str(c) for c in le.classes_]
+)
+v = viz_model.view(fontname="DejaVu Sans")
+v.save("decision_tree_viz.svg") # Save visualization
+
+y_pred = tree_model.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
+# y_pred_enc = tree_model.predict(X_test) # Create predictions
+# y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
+acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
+print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
+
+cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Decision Tree") # Set title
+plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
+plt.show() # Display plot
 
 
 
 
-# #BAGGING
 
-# base_tree = DecisionTreeClassifier(random_state=123)
-# bag_model = BaggingClassifier(
-#     estimator=base_tree,
-#     n_estimators=300,        # number of trees
-#     max_samples=1.0,         # bootstrap sample size (fraction of training set)
-#     max_features=1.0,        # use all features per base estimator
-#     bootstrap=True,          # sample rows with replacement
-#     bootstrap_features=False,# do not bootstrap features
-#     oob_score=True,          # get OOB estimate
-#     n_jobs=-1,               # use all cores
-#     random_state=123
-# )
 
-# bag_model.fit(X_train, y_train)
+#BAGGING
 
-# y_pred = bag_model.predict(X_test)
+base_tree = DecisionTreeClassifier(random_state=123)
+bag_model = BaggingClassifier(
+    estimator=base_tree,
+    n_estimators=300,        # number of trees
+    max_samples=1.0,         # bootstrap sample size (fraction of training set)
+    max_features=1.0,        # use all features per base estimator
+    bootstrap=True,          # sample rows with replacement
+    bootstrap_features=False,# do not bootstrap features
+    oob_score=True,          # get OOB estimate
+    n_jobs=-1,               # use all cores
+    random_state=123
+)
 
-# # Delete if runs
-# # y_pred_enc = bag_model.predict(X_test) # Create predictions
-# # y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
+bag_model.fit(X_train, y_train)
 
-# acc = accuracy_score(y_test, y_pred)
-# print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
+y_pred = bag_model.predict(X_test)
 
-# labels_in_order = list(le.classes_)  # ensure consistent label order
-# cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
 
-# # Generate confusion matrix
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
-# disp.plot(cmap="Blues") # Set colors
-# plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
-# plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
-# plt.show() # Display plot
+# y_pred_enc = bag_model.predict(X_test) # Create predictions
+# y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
+
+acc = accuracy_score(y_test, y_pred)
+print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
+
+labels_in_order = list(le.classes_)  # ensure consistent label order
+cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
+
+# Generate confusion matrix
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
+disp.plot(cmap="Blues") # Set colors
+plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
+plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
+plt.show() # Display plot
+
 
 
 
 # # Random Forest 
 
-# ## Be careful this can take some time to run ##
+# ## Took too long to run and was not included 
 # # Set range of values to try
 # n_trees_range = range(50, 501, 50)   # from 50 to 500 in steps of 50
 # oob_errors = [] # Create list to store results
@@ -722,83 +716,83 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 
 
 
-# # # # XGBoost
+# # # XGBoost
 
-# # Set up XGBDmatrix
-# dtrain = xgb.DMatrix(data=X_train.values, label=y_train)
-# dtest  = xgb.DMatrix(data=X_test.values,  label=y_test)
+# Set up XGBDmatrix
+dtrain = xgb.DMatrix(data=X_train.values, label=y_train)
+dtest  = xgb.DMatrix(data=X_test.values,  label=y_test)
 
-# # params = {
-# #         "objective": "binary:logistic", # Set objective
-# #         "eval_metric": ["auc", "error"],  # Track both AUC and error
-# #         "seed": 42, # set seed
+params = {
+        "objective": "binary:logistic", # Set objective
+        "eval_metric": ["auc", "error"],  # Track both AUC and error
+        "seed": 42, # set seed
 
-# #     }
-# # num_boost_round = 5 # Set number of rounds
+    }
+num_boost_round = 5 # Set number of rounds
 
-# # watchlist = [(dtrain, "train")] # Set data for evaluation
-# # booster = xgb.train(params, # Set parameters
-# #                     dtrain,  # Set training data
-# #                     num_boost_round=num_boost_round, # Set number of rounds
-# #                     evals=watchlist,  # Set data to evaluate on
-# #                     verbose_eval=50) # Set print out frequency
-
-
-# # test_pred_raw = booster.predict(dtest)
-
-# # test_pred_cls = (test_pred_raw >= 0.5).astype(int)
+watchlist = [(dtrain, "train")] # Set data for evaluation
+booster = xgb.train(params, # Set parameters
+                    dtrain,  # Set training data
+                    num_boost_round=num_boost_round, # Set number of rounds
+                    evals=watchlist,  # Set data to evaluate on
+                    verbose_eval=50) # Set print out frequency
 
 
-# # print("\nConfusion matrix:")
-# # cm = (confusion_matrix(y_test, test_pred_cls))
-# # disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-# # disp.plot(cmap="Blues") # Set color map
-# # plt.title("Confusion Matrix — XGBoost") # Set title
-# # plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
-# # plt.close()
-# # print("\nAccuracy):")
-# # print(accuracy_score(y_test, test_pred_cls)) # Get classification report
+test_pred_raw = booster.predict(dtest)
+
+test_pred_cls = (test_pred_raw >= 0.5).astype(int)
+
+
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — XGBoost") # Set title
+plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls)) # Get classification report
 
 
 # # # Now we will weight it!
 
-# # # # Count values
-# # counts = pd.Series(y_train).value_counts().sort_index()
-# # neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
-# # print(f"Number of negative samples: {neg}")
-# # print(f"Number of positive samples: {pos}")
+# # Count values
+counts = pd.Series(y_train).value_counts().sort_index()
+neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
+print(f"Number of negative samples: {neg}")
+print(f"Number of positive samples: {pos}")
 
-# # # Calculate ratio
-# # ratio = neg / pos
-# # # Set ratio as weight for positive samples
-# # w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
+# Calculate ratio
+ratio = neg / pos
+# Set ratio as weight for positive samples
+w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
 
-# # # Build weighted DMatrices
-# # dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
+# Build weighted DMatrices
+dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
 
-# # watchlist = [(dtrain_w, "train")] # Set data for evaluation
-# # xgb_w = xgb.train(params, # Set parameters
-# #                     dtrain_w,  # Set training data
-# #                     num_boost_round=3, # Set number of rounds
-# #                     evals=watchlist,  # Set data to evaluate on
-# #                     verbose_eval=50) # Set print out frequency
+watchlist = [(dtrain_w, "train")] # Set data for evaluation
+xgb_w = xgb.train(params, # Set parameters
+                    dtrain_w,  # Set training data
+                    num_boost_round=3, # Set number of rounds
+                    evals=watchlist,  # Set data to evaluate on
+                    verbose_eval=50) # Set print out frequency
 
-# # test_pred_w = xgb_w.predict(dtest) # Create predictions
-
-
-# # # Convert predictions into classes at 0.5
-# # test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+test_pred_w = xgb_w.predict(dtest) # Create predictions
 
 
-# # print("\nConfusion matrix:")
-# # cm = (confusion_matrix(y_test, test_pred_cls_w))
-# # disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-# # disp.plot(cmap="Blues") # Set color map
-# # plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-# # plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
-# # plt.close()
-# # print("\nAccuracy):")
-# # print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+# Convert predictions into classes at 0.5
+test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+
+
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls_w))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
 
 
 
@@ -1159,13 +1153,13 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 # # Best Parameters & Weighted
 # # DO NOT RUN THE TUNING PARAMETERS IT TAKES AROUND 1 HOUR ON CRC
 
-# max_depth        = 10
-# min_child_weight = 5
-# gamma            = 0.0
-# subsample        = 0.6
-# colsample_bytree = 0.6
-# eta              = 0.3
-# best_round       = 5
+max_depth        = 10
+min_child_weight = 5
+gamma            = 0.0
+subsample        = 0.6
+colsample_bytree = 0.6
+eta              = 0.3
+best_round       = 5
 
 
 
@@ -1174,115 +1168,115 @@ df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype
 
 
 
-# # Count values
-# counts = pd.Series(y_train).value_counts().sort_index()
-# neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
-# print(f"Number of negative samples: {neg}")
-# print(f"Number of positive samples: {pos}")
+# Count values
+counts = pd.Series(y_train).value_counts().sort_index()
+neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
+print(f"Number of negative samples: {neg}")
+print(f"Number of positive samples: {pos}")
 
-# # Calculate ratio
-# ratio = neg / pos
-# # Set ratio as weight for positive samples
-# w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
+# Calculate ratio
+ratio = neg / pos
+# Set ratio as weight for positive samples
+w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
 
-# # Build weighted DMatrices
-# dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
+# Build weighted DMatrices
+dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
 
-# params = {
-#     "objective": "binary:logistic",
-#     "eval_metric": ["auc", "error"],
-#     "max_depth": max_depth, # Use tuned value for max depth
-#     "min_child_weight": min_child_weight, # Use tuned value for min_child_weight
-#     "gamma": gamma, # Use tuned value for gamma
-#     "subsample": subsample, # Use tuned value for subsample
-#     "colsample_bytree": colsample_bytree, # Use tuned value for colsample_bytree
-#     "eta": eta, # Use tuned value for eta
-#     "tree_method": "hist",
-#     "seed": 111111,
-#     "nthread": 1,                  # single core
-# }
+params = {
+    "objective": "binary:logistic",
+    "eval_metric": ["auc", "error"],
+    "max_depth": max_depth, # Use tuned value for max depth
+    "min_child_weight": min_child_weight, # Use tuned value for min_child_weight
+    "gamma": gamma, # Use tuned value for gamma
+    "subsample": subsample, # Use tuned value for subsample
+    "colsample_bytree": colsample_bytree, # Use tuned value for colsample_bytree
+    "eta": eta, # Use tuned value for eta
+    "tree_method": "hist",
+    "seed": 111111,
+    "nthread": 1,                  # single core
+}
 
-# num_boost_round = best_round # Set number of rounds
+num_boost_round = best_round # Set number of rounds
 
-# watchlist = [(dtrain_w, "train")] # Set data for evaluation
-# xgb_tuned = xgb.train(params, # Set parameters
-#                     dtrain_w,  # Set training data
-#                     num_boost_round=num_boost_round, # Set number of rounds
-#                     evals=watchlist,  # Set data to evaluate on
-#                     verbose_eval=50) # Set print out frequency
+watchlist = [(dtrain_w, "train")] # Set data for evaluation
+xgb_tuned = xgb.train(params, # Set parameters
+                    dtrain_w,  # Set training data
+                    num_boost_round=num_boost_round, # Set number of rounds
+                    evals=watchlist,  # Set data to evaluate on
+                    verbose_eval=50) # Set print out frequency
 
-# test_pred_w = xgb_tuned.predict(dtest) # Create predictions
-
-
-# # Convert predictions into classes at 0.5
-# test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+test_pred_w = xgb_tuned.predict(dtest) # Create predictions
 
 
-# print("\nConfusion matrix:")
-# cm = (confusion_matrix(y_test, test_pred_cls_w))
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-# disp.plot(cmap="Blues") # Set color map
-# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-# plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
-# plt.close()
-# print("\nAccuracy):")
-# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+# Convert predictions into classes at 0.5
+test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
 
 
-
-# # Convert predictions into classes at 0.5
-# test_pred_cls_w = (test_pred_w >= 0.11).astype(int)
-
-
-# print("\nConfusion matrix:")
-# cm = (confusion_matrix(y_test, test_pred_cls_w))
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-# disp.plot(cmap="Blues") # Set color map
-# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-# plt.savefig("confusion_matrix_weighted_and_tuned_11.png", dpi=300, bbox_inches="tight")
-# plt.close()
-# print("\nAccuracy):")
-# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls_w))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
 
 
 
+# Convert predictions into classes at 0.5
+test_pred_cls_w = (test_pred_w >= 0.11).astype(int)
 
-# # Convert predictions into classes at 0.5
-# test_pred_cls_w = (test_pred_w >= 0.115).astype(int)
 
-
-# print("\nConfusion matrix:")
-# cm = (confusion_matrix(y_test, test_pred_cls_w))
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-# disp.plot(cmap="Blues") # Set color map
-# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-# plt.savefig("confusion_matrix_weighted_and_tuned_115.png", dpi=300, bbox_inches="tight")
-# plt.close()
-# print("\nAccuracy):")
-# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls_w))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.savefig("confusion_matrix_weighted_and_tuned_11.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
 
 
 
 
+# Convert predictions into classes at 0.5
+test_pred_cls_w = (test_pred_w >= 0.4).astype(int)
 
-# # # SHAP values to see importance of each column in the weighted tuned XGBoost model
 
-# # # Create TreeExplainer and compute SHAP values
-# # explainer = shap.TreeExplainer(xgb_tuned)
-# # shap_values = explainer(X_train)
+print("\nConfusion matrix:")
+cm = (confusion_matrix(y_test, test_pred_cls_w))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+disp.plot(cmap="Blues") # Set color map
+plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.savefig("confusion_matrix_weighted_and_tuned_115.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("\nAccuracy):")
+print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
 
-# # plt.figure()  # start a clean figure
-# # shap.plots.bar(shap_values, max_display=10)
-# # plt.title("Top 10 SHAP Feature Importances")   # optional title
-# # plt.savefig("shap_bar_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
-# # plt.close()
 
-# # # Create and save beeswarm plot
-# # plt.figure(figsize=(10, 8))   # optional: wider figure
-# # shap.plots.beeswarm(shap_values, max_display=25)
-# # plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
-# # plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
-# # plt.close()
+
+
+
+# SHAP values to see importance of each column in the weighted tuned XGBoost model
+
+# Create TreeExplainer and compute SHAP values
+explainer = shap.TreeExplainer(xgb_tuned)
+shap_values = explainer(X_train)
+
+plt.figure()  # start a clean figure
+shap.plots.bar(shap_values, max_display=10)
+plt.title("Top 10 SHAP Feature Importances")   # optional title
+plt.savefig("shap_bar_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+# Create and save beeswarm plot
+plt.figure(figsize=(10, 8))   # optional: wider figure
+shap.plots.beeswarm(shap_values, max_display=25)
+plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
+plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+plt.close()
 
 
 
