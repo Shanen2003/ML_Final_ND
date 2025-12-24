@@ -1277,9 +1277,3 @@ shap.plots.beeswarm(shap_values, max_display=25)
 plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
 plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
 plt.close()
-
-
-
-
-
-
