@@ -1391,9 +1391,124 @@ for xb, yb in train_ds.take(1):
     print("Batch y:", yb.shape)
 
 
+tf.keras.backend.clear_session()
+
+model = keras.Sequential([
+    layers.Input(shape=(SEQ_LEN, n_features)),
+    layers.Masking(mask_value=0.0),          # safe even if you don't pad; doesn't hurt
+    layers.LSTM(64, return_sequences=False),
+    layers.Dropout(0.3),
+    layers.Dense(32, activation="relu"),
+    layers.Dropout(0.2),
+    layers.Dense(1, activation="sigmoid"),
+])
+
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+    loss="binary_crossentropy",
+    metrics=[
+        keras.metrics.BinaryAccuracy(name="acc"),
+        keras.metrics.AUC(name="auc"),
+        keras.metrics.Precision(name="precision"),
+        keras.metrics.Recall(name="recall"),
+    ],
+)
+
+model.summary()
 
 
 
+pos = (y_train_seq == 1).sum()
+neg = (y_train_seq == 0).sum()
+
+class_weight = {
+    0: (pos + neg) / (2.0 * neg),
+    1: (pos + neg) / (2.0 * pos),
+}
+
+print("Train window labels -> attack:", pos, "normal:", neg)
+print("class_weight:", class_weight)
+
+
+
+callbacks = [
+    keras.callbacks.EarlyStopping(
+        monitor="val_auc",
+        mode="max",
+        patience=3,
+        restore_best_weights=True
+    ),
+    keras.callbacks.ReduceLROnPlateau(
+        monitor="val_auc",
+        mode="max",
+        factor=0.5,
+        patience=2,
+        min_lr=1e-6
+    )
+]
+
+history = model.fit(
+    train_ds,
+    validation_data=test_ds,   # for now; later we should carve out a proper val set from train
+    epochs=20,
+    class_weight=class_weight,
+    callbacks=callbacks,
+    verbose=1
+)
+
+
+
+
+y_prob = model.predict(test_ds).ravel()
+y_true = y_test_seq
+
+print("Test ROC AUC:", roc_auc_score(y_true, y_prob))
+
+# default threshold 0.5
+y_pred = (y_prob >= 0.5).astype(int)
+print(confusion_matrix(y_true, y_pred))
+print(classification_report(y_true, y_pred, digits=4))
+
+print("Train attack rate:", y_train_seq.mean())
+print("Test  attack rate:", y_test_seq.mean())
+
+
+# Confusion matrix for RNN
+cm = confusion_matrix(y_true, y_pred)
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=["Normal", "Attack"]
+)
+
+disp.plot(cmap="Blues")
+plt.title("Confusion Matrix — LSTM RNN (Threshold = 0.5)")
+plt.savefig(
+    "confusion_matrix_rnn_lstm_050.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+plt.close()
+
+print("\nRNN Accuracy:")
+print(accuracy_score(y_true, y_pred))
+
+
+y_pred_opt = (y_prob >= best_thresh).astype(int)
+
+cm_opt = confusion_matrix(y_true, y_pred_opt)
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_opt,
+    display_labels=["Normal", "Attack"]
+)
+disp.plot(cmap="Blues")
+plt.title(f"Confusion Matrix — LSTM RNN (Threshold = {best_thresh:.3f})")
+plt.savefig(
+    "confusion_matrix_rnn_lstm_optimized.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+plt.close()
 
 
 
