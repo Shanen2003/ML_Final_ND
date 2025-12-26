@@ -23,6 +23,7 @@ from scipy.stats import pointbiserialr
 from sklearn.ensemble import BaggingClassifier
 import joblib
 from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.model_selection import train_test_split
 
 
 
@@ -1368,7 +1369,7 @@ def make_windows(X, y, seq_len=50, stride=1):
     return np.array(Xs, dtype=np.float32), np.array(ys, dtype=np.int32)
 
 SEQ_LEN = 50
-STRIDE = 5
+STRIDE = 1
 
 X_train_seq, y_train_seq = make_windows(X_train_scaled, y_train_np, SEQ_LEN, STRIDE)
 X_test_seq, y_test_seq   = make_windows(X_test_scaled,  y_test_np,  SEQ_LEN, STRIDE)
@@ -1498,12 +1499,29 @@ print(accuracy_score(y_true, y_pred))
 
 # Best Threshold
 
+X_train_seq_sub, X_val_seq, y_train_seq_sub, y_val_seq = train_test_split(
+    X_train_seq,
+    y_train_seq,
+    test_size=0.2,
+    stratify=y_train_seq,
+    random_state=42,
+)
+
+val_ds = tf.data.Dataset.from_tensor_slices((X_val_seq, y_val_seq))
+val_ds = val_ds.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+
+
+y_val_prob = model.predict(val_ds).ravel()
+y_val_true = y_val_seq
+
+
+
 thresholds = np.linspace(0.01, 0.99, 99)
 
 f1s = []
 for t in thresholds:
-    yp = (y_prob >= t).astype(int)
-    f1s.append(f1_score(y_true, yp))
+    yp = (y_val_prob  >= t).astype(int)
+    f1s.append(f1_score(y_val_true, yp))
 
 best_thresh = float(thresholds[int(np.argmax(f1s))])
 
@@ -1541,7 +1559,21 @@ print(accuracy_score(y_true, y_pred_opt))
 # joblib.dump(scaler, "rnn_scaler.joblib")
 # print("Saved scaler to: rnn_scaler.joblib")
 
+y_pred_opt = (y_prob >= best_thresh).astype(int)
 
+cm_opt = confusion_matrix(y_true, y_pred_opt)
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_opt,
+    display_labels=["Normal", "Attack"]
+)
+disp.plot(cmap="Blues")
+plt.title(f"Confusion Matrix — LSTM RNN (Threshold = {best_thresh:.3f})")
+plt.savefig(
+    "confusion_matrix_rnn_lstm_optimized.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+plt.close()
 
 
 
