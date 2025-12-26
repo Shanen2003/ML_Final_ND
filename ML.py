@@ -21,6 +21,8 @@ from sklearn import preprocessing
 import shap
 from scipy.stats import pointbiserialr
 from sklearn.ensemble import BaggingClassifier
+import joblib
+from sklearn.metrics import f1_score, precision_score, recall_score
 
 
 
@@ -1494,21 +1496,52 @@ print("\nRNN Accuracy:")
 print(accuracy_score(y_true, y_pred))
 
 
+# Best Threshold
+
+thresholds = np.linspace(0.01, 0.99, 99)
+
+f1s = []
+for t in thresholds:
+    yp = (y_prob >= t).astype(int)
+    f1s.append(f1_score(y_true, yp))
+
+best_thresh = float(thresholds[int(np.argmax(f1s))])
+
+print(f"Best threshold (max F1): {best_thresh:.3f}")
+print(f"F1 @ best threshold: {max(f1s):.4f}")
+
+# Optional: also print precision/recall at best threshold
 y_pred_opt = (y_prob >= best_thresh).astype(int)
+print("Precision @ best threshold:", precision_score(y_true, y_pred_opt, zero_division=0))
+print("Recall    @ best threshold:", recall_score(y_true, y_pred_opt, zero_division=0))
+
 
 cm_opt = confusion_matrix(y_true, y_pred_opt)
-disp = ConfusionMatrixDisplay(
-    confusion_matrix=cm_opt,
-    display_labels=["Normal", "Attack"]
-)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_opt, display_labels=["Normal", "Attack"])
 disp.plot(cmap="Blues")
 plt.title(f"Confusion Matrix — LSTM RNN (Threshold = {best_thresh:.3f})")
-plt.savefig(
-    "confusion_matrix_rnn_lstm_optimized.png",
-    dpi=300,
-    bbox_inches="tight"
-)
+plt.savefig("confusion_matrix_rnn_lstm_optimized.png", dpi=300, bbox_inches="tight")
 plt.close()
+
+print("\nRNN Accuracy @ best threshold:")
+print(accuracy_score(y_true, y_pred_opt))
+
+# # -----------------------------
+# # 3) SAVE THE MODEL (recommended: .keras)
+# # -----------------------------
+# model.save("rnn_lstm_model.keras")  # single-file Keras format (best default)
+# # Optional: also export SavedModel directory
+# model.export("rnn_lstm_savedmodel")  # creates a folder
+
+# print("Saved model to: rnn_lstm_model.keras and rnn_lstm_savedmodel/")
+
+# # -----------------------------
+# # 4) SAVE THE SCALER (so predictions later match training)
+# # -----------------------------
+# joblib.dump(scaler, "rnn_scaler.joblib")
+# print("Saved scaler to: rnn_scaler.joblib")
+
+
 
 
 
