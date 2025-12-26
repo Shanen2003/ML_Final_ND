@@ -105,108 +105,120 @@ y_test  = df_test['Normal_Attack'].astype(int)
 
 
 
-# #Point Biserial Correlation
 
-#Setting up X and Y, then getting point biserial in a dictionary
+# # Data Breakdown
 
-y = df['Normal_Attack']
-x = df.drop(columns = ['Timestamp', 'Normal_Attack'])
+# print(f"X_Train shape: {X_train.shape}, X_Test shape: {X_test.shape}, y_train shape: {y_train.shape}, y_test shape: {y_test.shape}")
+# print(f"Full Data Shape: {df.shape}")
+# print(f"Attack :{len(df[df['Normal_Attack'] == 1])}, Normal : {len(df[df['Normal_Attack'] == 0])}")
 
 
-x.dtypes
-y.dtypes
 
-results = {}
 
-for col in x.columns:
-    results['correlation_' + str(col)] = pointbiserialr(y, x[col])
 
-# print(results) Ignore this this was to make sure the loop worked
 
-# Dictionary to to DataFrame, renaming, and dropping some useless rows
-df = pd.DataFrame.from_dict(results, orient='index')
-df = df.rename(columns={'statistic': 'r', 'pvalue': 'p'})
+# # #Point Biserial Correlation
 
-# df
+# #Setting up X and Y, then getting point biserial in a dictionary
 
-df.index = df.index.str.replace('correlation_', '', regex=False).str.strip()
+# y = df['Normal_Attack']
+# x = df.drop(columns = ['Timestamp', 'Normal_Attack'])
 
-df = df.dropna(subset=['r'])
 
-# df.head()
+# x.dtypes
+# y.dtypes
 
-#Actual Plot (of the top 10)
-topN = 10
-df_sorted = df.reindex(df['r'].sort_values(ascending=False).index)
+# results = {}
 
-plt.figure(figsize=(8, 10))
-df_sorted['r'].head(topN).iloc[::-1].plot(kind='barh')
-plt.xlabel('Point-biserial r (Attack = 1)')
-plt.title(f'Top {topN} Features by Attack Correlation')
-plt.tight_layout()
-plt.savefig("Point Biserial-R", dpi=300, bbox_inches="tight")
-plt.close()
+# for col in x.columns:
+#     results['correlation_' + str(col)] = pointbiserialr(y, x[col])
 
-# # #
+# # print(results) Ignore this this was to make sure the loop worked
 
-# # # # Some box plots
+# # Dictionary to to DataFrame, renaming, and dropping some useless rows
+# df = pd.DataFrame.from_dict(results, orient='index')
+# df = df.rename(columns={'statistic': 'r', 'pvalue': 'p'})
 
-# # # AIT402 = (
-# # #     ggplot(data, aes(x="Normal_Attack", y="AIT402")) 
-# # #     + geom_boxplot()  
-# # #     + theme_bw()  
-# # #     + theme(
-# # #         panel_grid_major=element_blank(),  
-# # #         panel_grid_minor=element_blank(),
-# # #         panel_border=element_blank(),
-# # #         panel_background=element_blank()
-# # #     )
-# # #     + labs(
-# # #         x="Normal or Attack",  # Axis label
-# # #         title="AIT402 Normal and Attack"  # Plot title
-# # #     )
+# # df
+
+# df.index = df.index.str.replace('correlation_', '', regex=False).str.strip()
+
+# df = df.dropna(subset=['r'])
+
+# # df.head()
+
+# #Actual Plot (of the top 10)
+# topN = 10
+# df_sorted = df.reindex(df['r'].sort_values(ascending=False).index)
+
+# plt.figure(figsize=(8, 10))
+# df_sorted['r'].head(topN).iloc[::-1].plot(kind='barh')
+# plt.xlabel('Point-biserial r (Attack = 1)')
+# plt.title(f'Top {topN} Features by Attack Correlation')
+# plt.tight_layout()
+# plt.savefig("Point Biserial-R", dpi=300, bbox_inches="tight")
+# plt.close()
+
+# # # #
+
+# # # # # Some box plots
+
+# # # # AIT402 = (
+# # # #     ggplot(data, aes(x="Normal_Attack", y="AIT402")) 
+# # # #     + geom_boxplot()  
+# # # #     + theme_bw()  
+# # # #     + theme(
+# # # #         panel_grid_major=element_blank(),  
+# # # #         panel_grid_minor=element_blank(),
+# # # #         panel_border=element_blank(),
+# # # #         panel_background=element_blank()
+# # # #     )
+# # # #     + labs(
+# # # #         x="Normal or Attack",  # Axis label
+# # # #         title="AIT402 Normal and Attack"  # Plot title
+# # # #     )
     
-# # # )
+# # # # )
 
-# # # FIT504
+# # # # FIT504
 
-# # # FIT401 = (
-# # #     ggplot(data, aes(x="Normal_Attack", y="FIT401")) 
-# # #     + geom_boxplot()  
-# # #     + theme_bw()  
-# # #     + theme(
-# # #         panel_grid_major=element_blank(),  
-# # #         panel_grid_minor=element_blank(),
-# # #         panel_border=element_blank(),
-# # #         panel_background=element_blank()
-# # #     )
-# # #     + labs(
-# # #         x="Normal or Attack",  # Axis label
-# # #         title="Fit401 Normal and Attack"  # Plot title
-# # #     )
+# # # # FIT401 = (
+# # # #     ggplot(data, aes(x="Normal_Attack", y="FIT401")) 
+# # # #     + geom_boxplot()  
+# # # #     + theme_bw()  
+# # # #     + theme(
+# # # #         panel_grid_major=element_blank(),  
+# # # #         panel_grid_minor=element_blank(),
+# # # #         panel_border=element_blank(),
+# # # #         panel_background=element_blank()
+# # # #     )
+# # # #     + labs(
+# # # #         x="Normal or Attack",  # Axis label
+# # # #         title="Fit401 Normal and Attack"  # Plot title
+# # # #     )
     
-# # # )
+# # # # )
 
-# # # FIT401
+# # # # FIT401
 
-# # # FIT503 = (
-# # #     ggplot(data, aes(x="Normal_Attack", y="FIT503")) 
-# # #     + geom_boxplot()  
-# # #     + theme_bw()  
-# # #     + theme(
-# # #         panel_grid_major=element_blank(),  
-# # #         panel_grid_minor=element_blank(),
-# # #         panel_border=element_blank(),
-# # #         panel_background=element_blank()
-# # #     )
-# # #     + labs(
-# # #         x="Normal or Attack",  # Axis label
-# # #         title="Fit503 Normal and Attack"  # Plot title
-# # #     )
+# # # # FIT503 = (
+# # # #     ggplot(data, aes(x="Normal_Attack", y="FIT503")) 
+# # # #     + geom_boxplot()  
+# # # #     + theme_bw()  
+# # # #     + theme(
+# # # #         panel_grid_major=element_blank(),  
+# # # #         panel_grid_minor=element_blank(),
+# # # #         panel_border=element_blank(),
+# # # #         panel_background=element_blank()
+# # # #     )
+# # # #     + labs(
+# # # #         x="Normal or Attack",  # Axis label
+# # # #         title="Fit503 Normal and Attack"  # Plot title
+# # # #     )
     
-# # # )
+# # # # )
 
-# # # FIT503
+# # # # FIT503
 
 
 
@@ -215,488 +227,488 @@ plt.close()
 
 
 
-df['Normal_Attack'] = df['Normal_Attack'].map({0 : 'Normal', 1 : 'Attack'})
+# df['Normal_Attack'] = df['Normal_Attack'].map({0 : 'Normal', 1 : 'Attack'})
 
 
-AIT402 = (
-    ggplot(df, aes(x="Normal_Attack", y="AIT402", fill = "Normal_Attack")) 
-    + geom_boxplot()  
-    + theme_bw()  
-    + theme(
-        panel_grid_major=element_blank(),  
-        panel_grid_minor=element_blank(),
-        panel_border=element_blank(),
-        panel_background=element_blank()
-    )
-    + labs(
-        x="Normal or Attack",  # Axis label
-        title="AIT402 Normal and Attack"  # Plot title
-    )
-)
-
-AIT402.save("AIT402_Boxplot.png", dpi=300, width=6, height=4)
-
-
-AIT502 = (
-    ggplot(df, aes(x="Normal_Attack", y="AIT502", fill = "Normal_Attack")) 
-    + geom_boxplot()  
-    + theme_bw()  
-    + theme(
-        panel_grid_major=element_blank(),  
-        panel_grid_minor=element_blank(),
-        panel_border=element_blank(),
-        panel_background=element_blank()
-    )
-    + labs(
-        x="Normal or Attack",  # Axis label
-        title="AIT502 Normal and Attack"  # Plot title
-    )
-)
-
-AIT502.save("AIT502_Boxplot.png", dpi=300, width=6, height=4)
-
-
-MV304 = (
-    ggplot(df, aes(x="Normal_Attack", y="MV304", fill = "Normal_Attack")) 
-    + geom_boxplot()  
-    + theme_bw()  
-    + theme(
-        panel_grid_major=element_blank(),  
-        panel_grid_minor=element_blank(),
-        panel_border=element_blank(),
-        panel_background=element_blank()
-    )
-    + labs(
-        x="Normal or Attack",  # Axis label
-        title="MV304 Normal and Attack"  # Plot title
-    )
-)
-
-MV304.save("MV304_Boxplot.png", dpi=300, width=6, height=4)
-
-
-
-df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
-
-
-
-
-
-
-
-
-
-
-
-
-#Example
-
-# Dummy predictions: treat everything as Normal (0)
-y_dummy = np.zeros_like(y_test)
-
-# Confusion matrix
-cm_dummy = confusion_matrix(y_test, y_dummy, labels=[0, 1])
-disp = ConfusionMatrixDisplay(confusion_matrix=cm_dummy, display_labels=["Normal", "Attack"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix — Predict All Normal (0)")
-plt.savefig("Confusion Matrix 0.png", dpi=300, bbox_inches="tight")
-plt.show()
-
-# Accuracy
-acc_dummy = accuracy_score(y_test, y_dummy)
-print("Accuracy (predict all Normal):", acc_dummy)
-
-
-
-
-
-
-
-
-
-
-# Logistic Regression with Lasso
-
-
-
-# df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
-y = df_train["Normal_Attack"].to_numpy()
-X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
-
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-features = X.columns
-
-x_data = pd.DataFrame(X_scaled, columns=features)
-
-
-
-
-
-
-
-
-
-# Manually Select Lasso Alpha
-lasso = Lasso(alpha=0.01, fit_intercept=True, max_iter=10000)
-lasso.fit(X_scaled, y)
-
-
-# OLS Regression with Lasso
-coef_series = pd.Series(lasso.coef_, index=features, name="coef")
-coef_df = coef_series.reset_index()
-
-selected_features = coef_series[coef_series != 0].index.tolist()
-
-predictors = [f'Q("{c}")' for c in selected_features]
-formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
-
-fit_3 = smf.logit(formula = formula, data = df_train).fit()
-
-print(fit_3.summary())
-summary_str = fit_3.summary().as_text()
-
-fig = plt.figure(figsize=(9, 7))
-fig.patch.set_alpha(0)     
-plt.axis('off')
-
-plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
-
-plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent=True)
-plt.close()
-
-# logistic regression predictions and accuracy
-logit_pred_prob = fit_3.predict(df_test[selected_features])
-logit_pred = (logit_pred_prob >= 0.5).astype(int)
-logit_acc = accuracy_score(y_test, logit_pred)
-print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
-
-
-# Confusion matrix for Logistic Regression
-cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
-
-disp = ConfusionMatrixDisplay(
-    confusion_matrix=cm_logit,
-    display_labels=["Normal", "Attack"]  # class names for 0 and 1
-)
-
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix — Logistic Regression")
-plt.savefig("Confusion Matrix — Logistic Regression.png",
-            dpi=300, bbox_inches="tight")
-plt.show()
-
-
-
-
-
-
-
-
-
-# # # Manually Select Lasso Alpha
-# # lasso = Lasso(alpha=0.15, fit_intercept=True, max_iter=10000)
-# # lasso.fit(X_scaled, y)
-
-# Or allow Cross-Validation to select Lasso Alpha
-lambda_seq = np.arange(0.1, 10.0 + 1e-12, 0.1)
-cv_model = LassoCV(alphas=lambda_seq, cv=10, fit_intercept=True, max_iter=10000)
-cv_model.fit(X_scaled, y)
-alpha_min = cv_model.alpha_
-lasso = Lasso(alpha=alpha_min, fit_intercept=True, max_iter=10000)
-lasso.fit(X_scaled, y)
-
-
-# OLS Regression with Lasso
-coef_series = pd.Series(lasso.coef_, index=features, name="coef")
-coef_df = coef_series.reset_index()
-
-selected_features = coef_series[coef_series != 0].index.tolist()
-
-predictors = [f'Q("{c}")' for c in selected_features]
-formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
-
-fit_3 = smf.logit(formula = formula, data = df_train).fit()
-
-print(fit_3.summary())
-summary_str = fit_3.summary().as_text()
-
-fig = plt.figure(figsize=(9, 7))
-fig.patch.set_alpha(0)     
-plt.axis('off')
-
-plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
-
-plt.savefig("Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
-plt.close()
-
-# logistic regression predictions and accuracy
-logit_pred_prob = fit_3.predict(df_test[selected_features])
-logit_pred = (logit_pred_prob >= 0.5).astype(int)
-logit_acc = accuracy_score(y_test, logit_pred)
-print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
-
-
-
-# Confusion matrix for Logistic Regression
-cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
-
-disp = ConfusionMatrixDisplay(
-    confusion_matrix=cm_logit,
-    display_labels=["Normal", "Attack"]  # class names for 0 and 1
-)
-
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix — Logistic Regression with Lasso")
-plt.savefig("Confusion Matrix — Logistic Regression with Lasso.png",
-            dpi=300, bbox_inches="tight")
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Bagging and random forest 
-
-# Decision Tree
-
-train_mask = ~X_train.isna().any(axis=1)
-X_train = X_train[train_mask]
-y_train = y_train[train_mask]
-
-test_mask = ~X_test.isna().any(axis=1)
-X_test = X_test[test_mask]
-y_test = y_test[test_mask]
-
-tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
-tree_model.fit(X_train, y_train) # Fit tree
-
-# Encode labels for visualziation
-le = preprocessing.LabelEncoder()
-y_train_enc = le.fit_transform(y_train)
-
-# Set up visualization
-viz_model = dtreeviz.model(
-    tree_model,
-    X_train=X_train,
-    y_train=y_train_enc,
-    feature_names=list(X_train.columns),
-    target_name="outcome",
-    class_names=[str(c) for c in le.classes_]
-)
-v = viz_model.view(fontname="DejaVu Sans")
-v.save("decision_tree_viz.svg") # Save visualization
-
-y_pred = tree_model.predict(X_test)
-acc = accuracy_score(y_test, y_pred)
-# y_pred_enc = tree_model.predict(X_test) # Create predictions
-# y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
-acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
-print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
-
-cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Decision Tree") # Set title
-plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
-plt.show() # Display plot
-
-
-
-
-
-
-#BAGGING
-
-base_tree = DecisionTreeClassifier(random_state=123)
-bag_model = BaggingClassifier(
-    estimator=base_tree,
-    n_estimators=300,        # number of trees
-    max_samples=1.0,         # bootstrap sample size (fraction of training set)
-    max_features=1.0,        # use all features per base estimator
-    bootstrap=True,          # sample rows with replacement
-    bootstrap_features=False,# do not bootstrap features
-    oob_score=True,          # get OOB estimate
-    n_jobs=-1,               # use all cores
-    random_state=123
-)
-
-bag_model.fit(X_train, y_train)
-
-y_pred = bag_model.predict(X_test)
-
-
-# y_pred_enc = bag_model.predict(X_test) # Create predictions
-# y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
-
-acc = accuracy_score(y_test, y_pred)
-print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
-
-labels_in_order = list(le.classes_)  # ensure consistent label order
-cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
-
-# Generate confusion matrix
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
-disp.plot(cmap="Blues") # Set colors
-plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
-plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
-plt.show() # Display plot
-
-
-
-
-# # Random Forest 
-
-# ## Took too long to run and was not included 
-# # Set range of values to try
-# n_trees_range = range(50, 501, 50)   # from 50 to 500 in steps of 50
-# oob_errors = [] # Create list to store results
-
-# # For each number of trees
-# for n_trees in n_trees_range:
-#     bag_model = BaggingClassifier( # Set up model
-#         estimator=DecisionTreeClassifier(random_state=123),
-#         n_estimators=n_trees, # Set number of trees
-#         oob_score=True,
-#         n_jobs=-1,
-#         random_state=123
-#     )
-#     bag_model.fit(X_train, y_train_enc) # Fit model
-#     oob_error = 1 - bag_model.oob_score_ # Calculate error
-#     oob_errors.append((n_trees, oob_error)) # Store number of trees and error
-
-# # Create data frame
-# oob_df = pd.DataFrame(oob_errors, columns=["n_trees", "oob_error"])
-
-# g_1 =(
-#     ggplot(oob_df, # Set data
-#            aes(x="n_trees", y="oob_error")) # Set X and y
-#     + geom_line(color="blue") # Set line
-#     + geom_point(color="red") # Set scatter plot
-#     + labs(
-#         title="OOB Error vs Number of Trees (Bagging)",
-#         x="Number of Trees",
-#         y="OOB Error"
-#     )
-#     + theme_minimal() # Set theme
+# AIT402 = (
+#     ggplot(df, aes(x="Normal_Attack", y="AIT402", fill = "Normal_Attack")) 
+#     + geom_boxplot()  
+#     + theme_bw()  
 #     + theme(
-#         panel_grid_major=element_blank(),  # Turn off background grid
+#         panel_grid_major=element_blank(),  
 #         panel_grid_minor=element_blank(),
 #         panel_border=element_blank(),
 #         panel_background=element_blank()
 #     )
+#     + labs(
+#         x="Normal or Attack",  # Axis label
+#         title="AIT402 Normal and Attack"  # Plot title
+#     )
 # )
 
-# g_1.save("oob_error_vs_trees.png", dpi=300)
+# AIT402.save("AIT402_Boxplot.png", dpi=300, width=6, height=4)
 
 
-# best_row = oob_df.loc[oob_df["oob_error"].idxmin()].copy() # Find minimum error
-# best_n_trees = int(best_row["n_trees"]) # Extract number of trees
-# best_oob_error = float(best_row["oob_error"]) # Identify error
-# print(f"Selected n_trees = {best_n_trees} with OOB Error = {best_oob_error:.4f}") # Print result
-
-# # Fit Bagging model with optimal number of trees
-# final_bag = BaggingClassifier(
-#     estimator=DecisionTreeClassifier(random_state=123), # Set type of estimator
-#     n_estimators=best_n_trees, # Set number of trees
-#     oob_score=True, # Calculate OOB error
-#     n_jobs=-1, # Run on max number of cores
-#     random_state=123 # Set seed
+# AIT502 = (
+#     ggplot(df, aes(x="Normal_Attack", y="AIT502", fill = "Normal_Attack")) 
+#     + geom_boxplot()  
+#     + theme_bw()  
+#     + theme(
+#         panel_grid_major=element_blank(),  
+#         panel_grid_minor=element_blank(),
+#         panel_border=element_blank(),
+#         panel_background=element_blank()
+#     )
+#     + labs(
+#         x="Normal or Attack",  # Axis label
+#         title="AIT502 Normal and Attack"  # Plot title
+#     )
 # )
-# # Fit model
-# final_bag.fit(X_train, y_train_enc)
 
-# print(f"OOB Accuracy (Final Model): {final_bag.oob_score_:.4f}")
+# AIT502.save("AIT502_Boxplot.png", dpi=300, width=6, height=4)
 
-# y_pred = final_bag.predict(X_test)
 
-# # MAY BE ABLE TO DELETE
-# # # Create test-set predictions (convert back to original string labels)
-# # y_pred_enc = final_bag.predict(X_test)
-# # y_pred     = le.inverse_transform(y_pred_enc)
+# MV304 = (
+#     ggplot(df, aes(x="Normal_Attack", y="MV304", fill = "Normal_Attack")) 
+#     + geom_boxplot()  
+#     + theme_bw()  
+#     + theme(
+#         panel_grid_major=element_blank(),  
+#         panel_grid_minor=element_blank(),
+#         panel_border=element_blank(),
+#         panel_background=element_blank()
+#     )
+#     + labs(
+#         x="Normal or Attack",  # Axis label
+#         title="MV304 Normal and Attack"  # Plot title
+#     )
+# )
 
-# # Calculate Accuracy
-# acc = accuracy_score(y_test, y_pred)
-# print(f"Bagging (Final, {best_n_trees} trees) Accuracy on Test Set: {acc:.4f}")
+# MV304.save("MV304_Boxplot.png", dpi=300, width=6, height=4)
 
-# labels_in_order = list(le.classes_)  # preserves label order (e.g., ['Loss','Win'])
-# cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
 
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order) # Generate confusion matrix
+
+# df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
+
+
+
+
+
+
+
+
+
+
+
+
+# #Example
+
+# # Dummy predictions: treat everything as Normal (0)
+# y_dummy = np.zeros_like(y_test)
+
+# # Confusion matrix
+# cm_dummy = confusion_matrix(y_test, y_dummy, labels=[0, 1])
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm_dummy, display_labels=["Normal", "Attack"])
 # disp.plot(cmap="Blues")
-# plt.title(f"Confusion Matrix — Bagging ({best_n_trees} trees)")
-# plt.savefig(f"confusion_matrix_RandomForest_best_{best_n_trees}.png", dpi=300, bbox_inches="tight")
+# plt.title("Confusion Matrix — Predict All Normal (0)")
+# plt.savefig("Confusion Matrix 0.png", dpi=300, bbox_inches="tight")
 # plt.show()
 
-# n_features = X_train.shape[1] # Set number of features
-# global_importance = np.zeros(n_features, dtype=float) # Create vector of zeros
+# # Accuracy
+# acc_dummy = accuracy_score(y_test, y_dummy)
+# print("Accuracy (predict all Normal):", acc_dummy)
 
-# # If feature sub-sampling were enabled (bootstrap_features=True or max_features<1.0),
-# # BaggingClassifier exposes `estimators_features_` to map local → global feature indices.
-# has_feature_subsampling = hasattr(final_bag, "estimators_features_") and final_bag.estimators_features_ is not None
 
-# num_used_estimators = 0 # Start at 0
-# for i, est in enumerate(final_bag.estimators_): # For each model
-#     if not hasattr(est, "feature_importances_"):
-#         # If a base estimator lacks feature_importances_, skip it (shouldn't happen with DecisionTree)
-#         continue
 
-#     fi = est.feature_importances_ # Extract feature importance
-#     if has_feature_subsampling:
-#         # Map local importances back to global columns
-#         feats_idx = final_bag.estimators_features_[i]
-#         tmp = np.zeros(n_features, dtype=float)
-#         tmp[feats_idx] = fi
-#         global_importance += tmp
-#     else:
-#         # No sub-sampling → same feature space for all estimators
-#         global_importance += fi
 
-#     num_used_estimators += 1 # Increment number of estimators
 
-# # Average across estimators
-# if num_used_estimators > 0:
-#     global_importance /= num_used_estimators
-# else:
-#     raise RuntimeError("No usable base estimators with feature_importances_.")
 
-# # Build tidy DataFrame
-# imp_df = (
-#     pd.DataFrame({
-#         "feature": X_train.columns,
-#         "importance": global_importance
-#     })
-#     .sort_values("importance", ascending=False)
-#     .reset_index(drop=True)
+
+
+
+
+# # Logistic Regression with Lasso
+
+
+
+# # df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
+# y = df_train["Normal_Attack"].to_numpy()
+# X = df_train.drop(columns=["Normal_Attack", 'Timestamp'])
+
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(X)
+# features = X.columns
+
+# x_data = pd.DataFrame(X_scaled, columns=features)
+
+
+
+
+
+
+
+
+
+# # Manually Select Lasso Alpha
+# lasso = Lasso(alpha=0.01, fit_intercept=True, max_iter=10000)
+# lasso.fit(X_scaled, y)
+
+
+# # OLS Regression with Lasso
+# coef_series = pd.Series(lasso.coef_, index=features, name="coef")
+# coef_df = coef_series.reset_index()
+
+# selected_features = coef_series[coef_series != 0].index.tolist()
+
+# predictors = [f'Q("{c}")' for c in selected_features]
+# formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
+
+# fit_3 = smf.logit(formula = formula, data = df_train).fit()
+
+# print(fit_3.summary())
+# summary_str = fit_3.summary().as_text()
+
+# fig = plt.figure(figsize=(9, 7))
+# fig.patch.set_alpha(0)     
+# plt.axis('off')
+
+# plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
+
+# plt.savefig("Logistic_Regression.png", dpi=300, bbox_inches='tight', transparent=True)
+# plt.close()
+
+# # logistic regression predictions and accuracy
+# logit_pred_prob = fit_3.predict(df_test[selected_features])
+# logit_pred = (logit_pred_prob >= 0.5).astype(int)
+# logit_acc = accuracy_score(y_test, logit_pred)
+# print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
+
+
+# # Confusion matrix for Logistic Regression
+# cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
+
+# disp = ConfusionMatrixDisplay(
+#     confusion_matrix=cm_logit,
+#     display_labels=["Normal", "Attack"]  # class names for 0 and 1
 # )
 
-# top_k = 20 # Select number fo features to use
-# imp_top = imp_df.head(top_k).copy() # Create copy of data frame
+# disp.plot(cmap="Blues")
+# plt.title("Confusion Matrix — Logistic Regression")
+# plt.savefig("Confusion Matrix — Logistic Regression.png",
+#             dpi=300, bbox_inches="tight")
+# plt.show()
 
 
-# g4 = (
-#     ggplot(imp_top, aes(x="feature", y="importance"))
-#     + geom_col(fill= "blue")
-#     + coord_flip()
-#     + scale_y_continuous(expand=(0.0, 0.0))
-#     + labs(
-#         title=f"Variable Importance — Bagging (Top {top_k})",
-#         x="Feature",
-#         y="Mean Importance (across trees)"
-#     )
-#     + theme_minimal()
+
+
+
+
+
+
+
+# # # # Manually Select Lasso Alpha
+# # # lasso = Lasso(alpha=0.15, fit_intercept=True, max_iter=10000)
+# # # lasso.fit(X_scaled, y)
+
+# # Or allow Cross-Validation to select Lasso Alpha
+# lambda_seq = np.arange(0.1, 10.0 + 1e-12, 0.1)
+# cv_model = LassoCV(alphas=lambda_seq, cv=10, fit_intercept=True, max_iter=10000)
+# cv_model.fit(X_scaled, y)
+# alpha_min = cv_model.alpha_
+# lasso = Lasso(alpha=alpha_min, fit_intercept=True, max_iter=10000)
+# lasso.fit(X_scaled, y)
+
+
+# # OLS Regression with Lasso
+# coef_series = pd.Series(lasso.coef_, index=features, name="coef")
+# coef_df = coef_series.reset_index()
+
+# selected_features = coef_series[coef_series != 0].index.tolist()
+
+# predictors = [f'Q("{c}")' for c in selected_features]
+# formula = 'Q("Normal_Attack") ~ ' + " + ".join(predictors)
+
+# fit_3 = smf.logit(formula = formula, data = df_train).fit()
+
+# print(fit_3.summary())
+# summary_str = fit_3.summary().as_text()
+
+# fig = plt.figure(figsize=(9, 7))
+# fig.patch.set_alpha(0)     
+# plt.axis('off')
+
+# plt.text(0, 1, summary_str, fontsize=10, family="monospace", va="top")
+
+# plt.savefig("Logistic_Regression_With_Lasso.png", dpi=300, bbox_inches='tight', transparent=True)
+# plt.close()
+
+# # logistic regression predictions and accuracy
+# logit_pred_prob = fit_3.predict(df_test[selected_features])
+# logit_pred = (logit_pred_prob >= 0.5).astype(int)
+# logit_acc = accuracy_score(y_test, logit_pred)
+# print(f"\nLogistic Regression Accuracy: {logit_acc:.4f}")
+
+
+
+# # Confusion matrix for Logistic Regression
+# cm_logit = confusion_matrix(y_test, logit_pred, labels=[0, 1])
+
+# disp = ConfusionMatrixDisplay(
+#     confusion_matrix=cm_logit,
+#     display_labels=["Normal", "Attack"]  # class names for 0 and 1
 # )
 
-# g4.save("oob_error_vs_trees.png", dpi=300)
+# disp.plot(cmap="Blues")
+# plt.title("Confusion Matrix — Logistic Regression with Lasso")
+# plt.savefig("Confusion Matrix — Logistic Regression with Lasso.png",
+#             dpi=300, bbox_inches="tight")
+# plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # Bagging and random forest 
+
+# # Decision Tree
+
+# train_mask = ~X_train.isna().any(axis=1)
+# X_train = X_train[train_mask]
+# y_train = y_train[train_mask]
+
+# test_mask = ~X_test.isna().any(axis=1)
+# X_test = X_test[test_mask]
+# y_test = y_test[test_mask]
+
+# tree_model = DecisionTreeClassifier(max_depth=4, random_state=123)  # Initialize tree
+# tree_model.fit(X_train, y_train) # Fit tree
+
+# # Encode labels for visualziation
+# le = preprocessing.LabelEncoder()
+# y_train_enc = le.fit_transform(y_train)
+
+# # Set up visualization
+# viz_model = dtreeviz.model(
+#     tree_model,
+#     X_train=X_train,
+#     y_train=y_train_enc,
+#     feature_names=list(X_train.columns),
+#     target_name="outcome",
+#     class_names=[str(c) for c in le.classes_]
+# )
+# v = viz_model.view(fontname="DejaVu Sans")
+# v.save("decision_tree_viz.svg") # Save visualization
+
+# y_pred = tree_model.predict(X_test)
+# acc = accuracy_score(y_test, y_pred)
+# # y_pred_enc = tree_model.predict(X_test) # Create predictions
+# # y_pred = le.inverse_transform(y_pred_enc) # Convert predicitons back to Win/Loss
+# acc = accuracy_score(y_test, y_pred) # Calcualte accuracy
+# print(f"\nDecision Tree Accuracy on Test Set: {acc:.4f}") # Print accuracy
+
+# cm = confusion_matrix(y_test, y_pred, labels=le.classes_) # Create confusion matrix
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_) # Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Decision Tree") # Set title
+# plt.savefig("Confusion Matrix — Decision Tree.png", dpi=300, bbox_inches="tight")
+# plt.show() # Display plot
+
+
+
+
+
+
+# #BAGGING
+
+# base_tree = DecisionTreeClassifier(random_state=123)
+# bag_model = BaggingClassifier(
+#     estimator=base_tree,
+#     n_estimators=300,        # number of trees
+#     max_samples=1.0,         # bootstrap sample size (fraction of training set)
+#     max_features=1.0,        # use all features per base estimator
+#     bootstrap=True,          # sample rows with replacement
+#     bootstrap_features=False,# do not bootstrap features
+#     oob_score=True,          # get OOB estimate
+#     n_jobs=-1,               # use all cores
+#     random_state=123
+# )
+
+# bag_model.fit(X_train, y_train)
+
+# y_pred = bag_model.predict(X_test)
+
+
+# # y_pred_enc = bag_model.predict(X_test) # Create predictions
+# # y_pred     = le.inverse_transform(y_pred_enc) # Convert back to Win/Loss
+
+# acc = accuracy_score(y_test, y_pred)
+# print(f"Bagging (Decision Trees) Accuracy on Test Set: {acc:.4f}")
+
+# labels_in_order = list(le.classes_)  # ensure consistent label order
+# cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
+
+# # Generate confusion matrix
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order)
+# disp.plot(cmap="Blues") # Set colors
+# plt.title("Confusion Matrix — Bagging (Decision Trees)") # Set title
+# plt.savefig("confusion_matrix_Bagging.png", dpi=300, bbox_inches="tight")
+# plt.show() # Display plot
+
+
+
+
+# # # Random Forest 
+
+# # ## Took too long to run and was not included 
+# # # Set range of values to try
+# # n_trees_range = range(50, 501, 50)   # from 50 to 500 in steps of 50
+# # oob_errors = [] # Create list to store results
+
+# # # For each number of trees
+# # for n_trees in n_trees_range:
+# #     bag_model = BaggingClassifier( # Set up model
+# #         estimator=DecisionTreeClassifier(random_state=123),
+# #         n_estimators=n_trees, # Set number of trees
+# #         oob_score=True,
+# #         n_jobs=-1,
+# #         random_state=123
+# #     )
+# #     bag_model.fit(X_train, y_train_enc) # Fit model
+# #     oob_error = 1 - bag_model.oob_score_ # Calculate error
+# #     oob_errors.append((n_trees, oob_error)) # Store number of trees and error
+
+# # # Create data frame
+# # oob_df = pd.DataFrame(oob_errors, columns=["n_trees", "oob_error"])
+
+# # g_1 =(
+# #     ggplot(oob_df, # Set data
+# #            aes(x="n_trees", y="oob_error")) # Set X and y
+# #     + geom_line(color="blue") # Set line
+# #     + geom_point(color="red") # Set scatter plot
+# #     + labs(
+# #         title="OOB Error vs Number of Trees (Bagging)",
+# #         x="Number of Trees",
+# #         y="OOB Error"
+# #     )
+# #     + theme_minimal() # Set theme
+# #     + theme(
+# #         panel_grid_major=element_blank(),  # Turn off background grid
+# #         panel_grid_minor=element_blank(),
+# #         panel_border=element_blank(),
+# #         panel_background=element_blank()
+# #     )
+# # )
+
+# # g_1.save("oob_error_vs_trees.png", dpi=300)
+
+
+# # best_row = oob_df.loc[oob_df["oob_error"].idxmin()].copy() # Find minimum error
+# # best_n_trees = int(best_row["n_trees"]) # Extract number of trees
+# # best_oob_error = float(best_row["oob_error"]) # Identify error
+# # print(f"Selected n_trees = {best_n_trees} with OOB Error = {best_oob_error:.4f}") # Print result
+
+# # # Fit Bagging model with optimal number of trees
+# # final_bag = BaggingClassifier(
+# #     estimator=DecisionTreeClassifier(random_state=123), # Set type of estimator
+# #     n_estimators=best_n_trees, # Set number of trees
+# #     oob_score=True, # Calculate OOB error
+# #     n_jobs=-1, # Run on max number of cores
+# #     random_state=123 # Set seed
+# # )
+# # # Fit model
+# # final_bag.fit(X_train, y_train_enc)
+
+# # print(f"OOB Accuracy (Final Model): {final_bag.oob_score_:.4f}")
+
+# # y_pred = final_bag.predict(X_test)
+
+# # # MAY BE ABLE TO DELETE
+# # # # Create test-set predictions (convert back to original string labels)
+# # # y_pred_enc = final_bag.predict(X_test)
+# # # y_pred     = le.inverse_transform(y_pred_enc)
+
+# # # Calculate Accuracy
+# # acc = accuracy_score(y_test, y_pred)
+# # print(f"Bagging (Final, {best_n_trees} trees) Accuracy on Test Set: {acc:.4f}")
+
+# # labels_in_order = list(le.classes_)  # preserves label order (e.g., ['Loss','Win'])
+# # cm = confusion_matrix(y_test, y_pred, labels=labels_in_order) # Create confusion matrix
+
+# # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels_in_order) # Generate confusion matrix
+# # disp.plot(cmap="Blues")
+# # plt.title(f"Confusion Matrix — Bagging ({best_n_trees} trees)")
+# # plt.savefig(f"confusion_matrix_RandomForest_best_{best_n_trees}.png", dpi=300, bbox_inches="tight")
+# # plt.show()
+
+# # n_features = X_train.shape[1] # Set number of features
+# # global_importance = np.zeros(n_features, dtype=float) # Create vector of zeros
+
+# # # If feature sub-sampling were enabled (bootstrap_features=True or max_features<1.0),
+# # # BaggingClassifier exposes `estimators_features_` to map local → global feature indices.
+# # has_feature_subsampling = hasattr(final_bag, "estimators_features_") and final_bag.estimators_features_ is not None
+
+# # num_used_estimators = 0 # Start at 0
+# # for i, est in enumerate(final_bag.estimators_): # For each model
+# #     if not hasattr(est, "feature_importances_"):
+# #         # If a base estimator lacks feature_importances_, skip it (shouldn't happen with DecisionTree)
+# #         continue
+
+# #     fi = est.feature_importances_ # Extract feature importance
+# #     if has_feature_subsampling:
+# #         # Map local importances back to global columns
+# #         feats_idx = final_bag.estimators_features_[i]
+# #         tmp = np.zeros(n_features, dtype=float)
+# #         tmp[feats_idx] = fi
+# #         global_importance += tmp
+# #     else:
+# #         # No sub-sampling → same feature space for all estimators
+# #         global_importance += fi
+
+# #     num_used_estimators += 1 # Increment number of estimators
+
+# # # Average across estimators
+# # if num_used_estimators > 0:
+# #     global_importance /= num_used_estimators
+# # else:
+# #     raise RuntimeError("No usable base estimators with feature_importances_.")
+
+# # # Build tidy DataFrame
+# # imp_df = (
+# #     pd.DataFrame({
+# #         "feature": X_train.columns,
+# #         "importance": global_importance
+# #     })
+# #     .sort_values("importance", ascending=False)
+# #     .reset_index(drop=True)
+# # )
+
+# # top_k = 20 # Select number fo features to use
+# # imp_top = imp_df.head(top_k).copy() # Create copy of data frame
+
+
+# # g4 = (
+# #     ggplot(imp_top, aes(x="feature", y="importance"))
+# #     + geom_col(fill= "blue")
+# #     + coord_flip()
+# #     + scale_y_continuous(expand=(0.0, 0.0))
+# #     + labs(
+# #         title=f"Variable Importance — Bagging (Top {top_k})",
+# #         x="Feature",
+# #         y="Mean Importance (across trees)"
+# #     )
+# #     + theme_minimal()
+# # )
+
+# # g4.save("oob_error_vs_trees.png", dpi=300)
 
 
 
@@ -716,564 +728,672 @@ plt.show() # Display plot
 
 
 
-# # # XGBoost
+# # # # XGBoost
 
-# Set up XGBDmatrix
-dtrain = xgb.DMatrix(data=X_train.values, label=y_train)
-dtest  = xgb.DMatrix(data=X_test.values,  label=y_test)
+# # Set up XGBDmatrix
+# dtrain = xgb.DMatrix(data=X_train.values, label=y_train)
+# dtest  = xgb.DMatrix(data=X_test.values,  label=y_test)
 
-params = {
-        "objective": "binary:logistic", # Set objective
-        "eval_metric": ["auc", "error"],  # Track both AUC and error
-        "seed": 42, # set seed
+# params = {
+#         "objective": "binary:logistic", # Set objective
+#         "eval_metric": ["auc", "error"],  # Track both AUC and error
+#         "seed": 42, # set seed
 
-    }
-num_boost_round = 5 # Set number of rounds
+#     }
+# num_boost_round = 5 # Set number of rounds
 
-watchlist = [(dtrain, "train")] # Set data for evaluation
-booster = xgb.train(params, # Set parameters
-                    dtrain,  # Set training data
-                    num_boost_round=num_boost_round, # Set number of rounds
-                    evals=watchlist,  # Set data to evaluate on
-                    verbose_eval=50) # Set print out frequency
-
-
-test_pred_raw = booster.predict(dtest)
-
-test_pred_cls = (test_pred_raw >= 0.5).astype(int)
+# watchlist = [(dtrain, "train")] # Set data for evaluation
+# booster = xgb.train(params, # Set parameters
+#                     dtrain,  # Set training data
+#                     num_boost_round=num_boost_round, # Set number of rounds
+#                     evals=watchlist,  # Set data to evaluate on
+#                     verbose_eval=50) # Set print out frequency
 
 
-print("\nConfusion matrix:")
-cm = (confusion_matrix(y_test, test_pred_cls))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — XGBoost") # Set title
-plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("\nAccuracy):")
-print(accuracy_score(y_test, test_pred_cls)) # Get classification report
+# test_pred_raw = booster.predict(dtest)
+
+# test_pred_cls = (test_pred_raw >= 0.5).astype(int)
 
 
-# # # Now we will weight it!
+# print("\nConfusion matrix:")
+# cm = (confusion_matrix(y_test, test_pred_cls))
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — XGBoost") # Set title
+# plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
+# plt.close()
+# print("\nAccuracy):")
+# print(accuracy_score(y_test, test_pred_cls)) # Get classification report
+
+
+# # # # Now we will weight it!
+
+# # # Count values
+# counts = pd.Series(y_train).value_counts().sort_index()
+# neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
+# print(f"Number of negative samples: {neg}")
+# print(f"Number of positive samples: {pos}")
+
+# # Calculate ratio
+# ratio = neg / pos
+# # Set ratio as weight for positive samples
+# w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
+
+# # Build weighted DMatrices
+# dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
+
+# watchlist = [(dtrain_w, "train")] # Set data for evaluation
+# xgb_w = xgb.train(params, # Set parameters
+#                     dtrain_w,  # Set training data
+#                     num_boost_round=3, # Set number of rounds
+#                     evals=watchlist,  # Set data to evaluate on
+#                     verbose_eval=50) # Set print out frequency
+
+# test_pred_w = xgb_w.predict(dtest) # Create predictions
+
+
+# # Convert predictions into classes at 0.5
+# test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+
+
+# print("\nConfusion matrix:")
+# cm = (confusion_matrix(y_test, test_pred_cls_w))
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+# plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
+# plt.close()
+# print("\nAccuracy):")
+# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
+
+
+
+
+
+
+
+
+# # # # #XGBoost Tuning to get the best parameters
+# # # # # DO NOT RUN THIS BLOCK OF CODE USE THE SAVED VARIABLES 
+
+# # # # params = {
+# # # #     "objective": "binary:logistic",   # Set objective
+# # # #     "eta": 0.1,                       # Set learning rate
+# # # #     "eval_metric": ["auc", "error"],  # Track both AUC and error
+# # # #     "tree_method": "hist",
+# # # #     "seed": 111111,
+# # # #     "nthread": 1,                     # Parallel threads
+# # # # }
+
+# # # # # Run CV inside XGBoost
+# # # # cv_res = xgb.cv(
+# # # #     params=params,
+# # # #     dtrain=dtrain_w,              # Training data (DMatrix)
+# # # #     num_boost_round=400,       # Number of rounds
+# # # #     nfold=5,                    # 5-fold CV
+# # # #     verbose_eval=20,            # Print every 20 iters
+# # # #     stratified=True,            # Good practice for classification
+# # # #     shuffle=True,
+# # # # )
+
+# # # # cv_res
+
+# # # # # Identify best iteration
+# # # # #Remove idmix if you wan tot
+# # # # best_idx = cv_res['test-error-mean'].idxmin()
+# # # # best_iter = int(best_idx) + 1 # Increment by 1 to get iteration
+# # # # best_err  = float(cv_res.loc[best_idx, 'test-error-mean']) # Extract test error
+# # # # best_auc  = float(cv_res.loc[best_idx, 'test-auc-mean']) if 'test-auc-mean' in cv_res.columns else np.nan # Extract test AUC
+
+# # # # # Print results
+# # # # print(f"Best iteration (by min test error): {best_iter}")
+# # # # print(f"Min test error at best iter: {best_err:.6f}")
+# # # # if not np.isnan(best_auc):
+# # # #     print(f"Test AUC at best iter: {best_auc:.6f}")
+
+# # # # # Set range of parameter values to try
+# # # # grid = {
+# # # #     "max_depth": [3,  7, 10],
+# # # #     "min_child_weight": [ 5, 7, 10],
+# # # # }
+# # # # param_grid = list(ParameterGrid(grid))
+
+# # # # # Set base model parameters
+# # # # base_params = {
+# # # #     "objective": "binary:logistic",
+# # # #     "eta": 0.10,
+# # # #     "eval_metric": ["error", "auc"],
+# # # #     "tree_method": "hist",
+# # # #     "seed": 111111,
+# # # #     "nthread": 1,  # keep each worker single-threaded to avoid oversubscription
+# # # # }
+
+
+# # # # def run_one_cv(md, mcw):
+# # # #     """Run xgb.cv for a single (max_depth, min_child_weight) pair and return best metrics."""
+# # # #     params = base_params.copy()
+# # # #     params.update({"max_depth": int(md), "min_child_weight": int(mcw)})
+
+# # # #     cv = xgb.cv(
+# # # #         params=params,
+# # # #         dtrain=dtrain_w,              # DMatrix from earlier
+# # # #         num_boost_round=1000,        # nrounds = 100
+# # # #         nfold=5,                    # 5-fold CV
+# # # #         early_stopping_rounds=20,   # stop if no improvement
+# # # #         stratified=True,
+# # # #         shuffle=True,
+# # # #         verbose_eval=False,
+# # # #         seed=111111,
+# # # #     )
+
+# # # #     # Best round is the length of the early-stopped trace
+# # # #     best_round = len(cv)
+
+# # # #     # Read AUC & error at the best round row explicitly
+# # # #     best_row = cv.iloc[best_round - 1]
+# # # #     best_err = float(best_row["test-error-mean"])
+# # # #     best_auc = float(best_row["test-auc-mean"])
+
+# # # #     # Return results
+# # # #     return {
+# # # #         "max_depth": md,
+# # # #         "min_child_weight": mcw,
+# # # #         "best_round": best_round,
+# # # #         "test_error": best_err,
+# # # #         "test_auc": best_auc,
+# # # #     }
+
+# # # # results = []
+# # # # for p in tqdm(param_grid, desc="Grid CV (serial)"):
+# # # #     results.append(run_one_cv(p["max_depth"], p["min_child_weight"]))
+
+
+
+# # # # # Create and sort results data frame
+# # # # cv_results_df = (
+# # # #     pd.DataFrame(results)
+# # # #       .sort_values(["test_error", "test_auc"], ascending=[True, False])
+# # # #       .reset_index(drop=True)
+# # # # )
+
+# # # # # Identify best parameters0
+# # # # best_pair = cv_results_df.iloc[0].to_dict()
+# # # # print("Best (by min test_error, then max AUC):", best_pair)    
+
+
+# # # # # Create results data frame
+# # # # res_db = (
+# # # #     cv_results_df[["max_depth", "min_child_weight", "test_auc", "test_error"]]
+# # # #     .rename(columns={"test_auc": "auc", "test_error": "error"})
+# # # #     .copy()
+# # # # )
+
+# # # # tuned_max_depth = int(best_pair['max_depth']) # Extract max depth
+# # # # tuned_min_child = int(best_pair['min_child_weight']) # Extract min_child_weight
+
+# # # # # Define gamma grid
+# # # # gamma_vals = [0.00, 0.05, 0.10, 0.15, 0.20]
+
+# # # # # Set base parameters
+# # # # base_params = {
+# # # #     "objective": "binary:logistic",
+# # # #     "eta": 0.10,
+# # # #     "max_depth": tuned_max_depth, # Uuse tuned value of max depth
+# # # #     "min_child_weight": tuned_min_child, # Use tuned value of min child weight
+# # # #     "tree_method": "hist",
+# # # #     "eval_metric": ["auc", "error"],
+# # # #     "seed": 111111,
+# # # #     "nthread": 1,
+# # # # }
+
+# # # # ### Be careful this can take a long time to run ###
+# # # # rows = [] # Create data frame to store valus
+# # # # for g in tqdm(gamma_vals, desc="Gamma CV (serial)"): # For each gamma value
+# # # #     params = base_params.copy() # Create copy of base parameters
+# # # #     params["gamma"] = float(g) # Replace value with current gamma value
+
+# # # #     # Run xgb.cv
+# # # #     cv = xgb.cv(
+# # # #         params=params,
+# # # #         dtrain=dtrain_w,                # Set training data
+# # # #         num_boost_round=1000,          # Set number of rounds
+# # # #         nfold=5,                      # Set folds for cross validation
+# # # #         early_stopping_rounds=20,     # Set early stopping rounds
+# # # #         stratified=True,
+# # # #         shuffle=True,
+# # # #         verbose_eval=False,
+# # # #         seed=111111, #Set seed
+# # # #     )
+
+# # # #     # Best iteration is the length of the early-stopped trace
+# # # #     best_round = len(cv)
+# # # #     best_row = cv.iloc[best_round - 1]
+# # # #     # Store results from current iteration
+# # # #     rows.append({
+# # # #         "gamma": g,
+# # # #         "best_round": int(best_round),
+# # # #         "test_auc": float(best_row["test-auc-mean"]),
+# # # #         "test_error": float(best_row["test-error-mean"]),
+# # # #     })
+
+# # # # # Join results into data frame
+# # # # gamma_results = (pd.DataFrame(rows)
+# # # #                    .sort_values(['test_error', 'test_auc'], ascending=[True, False])
+# # # #                    .reset_index(drop=True))
+# # # # # # View results
+# # # # # display(gamma_results)
+# # # # # Extract best value
+# # # # best_gamma = float(gamma_results.iloc[0]['gamma'])
+# # # # # Print out vest value
+# # # # print(f"Selected gamma (by min test_error, then max AUC): {best_gamma:.2f}")
+
+# # # # tuned_gamma = float(best_gamma) # Extract best gamma value
+
+
+# # # # # Create grid of possible values
+# # # # grid = {
+# # # #     "subsample":        [0.6, 0.7, 0.8, 0.9, 1.0],
+# # # #     "colsample_bytree": [0.6, 0.7, 0.8, 0.9, 1.0],
+# # # # }
+# # # # # Convert into parameter grid and then list
+# # # # param_grid = list(ParameterGrid(grid))
+# # # # # Set base parameters
+# # # # base_params = {
+# # # #     "objective": "binary:logistic",
+# # # #     "eta": 0.10,
+# # # #     "max_depth": tuned_max_depth, # Use tuned value for max depth
+# # # #     "min_child_weight": tuned_min_child, # Use tuned value for min child weight
+# # # #     "gamma": tuned_gamma, # Use tuned value for gamma
+# # # #     "tree_method": "hist",
+# # # #     "eval_metric": ["auc", "error"],
+# # # #     "seed": 111111,
+# # # #     "nthread": 1,                     # single core
+# # # # }
+
+# # # # # Create function
+# # # # def run_one_cv(subsample, colsample_bytree):
+# # # #     """Run xgb.cv for a single (subsample, colsample_bytree) and return best metrics."""
+# # # #     params = base_params.copy() # Create copy of base parameters
+# # # #     params.update({ # Update with values of subsample and colsample_bytree
+# # # #         "subsample": float(subsample),
+# # # #         "colsample_bytree": float(colsample_bytree),
+# # # #     })
+# # # #     # Run xgb.cv
+# # # #     cv = xgb.cv(
+# # # #         params=params,  # Set parameters
+# # # #         dtrain=dtrain_w,  # Set training data
+# # # #         num_boost_round=1000, # Set number of rounds
+# # # #         nfold=5,  # Set cross-validation folds
+# # # #         early_stopping_rounds=20, # Set number of early stopping rounds
+# # # #         stratified=True,
+# # # #         shuffle=True,
+# # # #         verbose_eval=False,
+# # # #         seed=111111, # Set seed
+# # # #     )
+
+# # # #     best_round = len(cv)             # early-stopped length
+# # # #     best_row = cv.iloc[best_round - 1] # Identify best row
+# # # #     # Return results
+# # # #     return {
+# # # #         "subsample": subsample,
+# # # #         "colsample_bytree": colsample_bytree,
+# # # #         "best_round": int(best_round),
+# # # #         "test_auc": float(best_row["test-auc-mean"]),
+# # # #         "test_error": float(best_row["test-error-mean"]),
+# # # #     }
+
+# # # # ### Be careful this can take a long time to run ###
+# # # # rows = [] # Create empty list to store results
+# # # # # For each set of parameters
+# # # # for p in tqdm(param_grid, desc="Subsample × Colsample_bytree CV (serial)"):
+# # # #     rows.append(run_one_cv(p["subsample"], p["colsample_bytree"])) # Run tuning function and store results
+# # # # # Convert results into data frame
+# # # # sc_results = (pd.DataFrame(rows)
+# # # #                 .sort_values(['test_error','test_auc'], ascending=[True, False])
+# # # #                 .reset_index(drop=True))
+# # # # # # View results
+# # # # # display(sc_results.head(10))
+# # # # # Identify best results
+# # # # best_sc = sc_results.iloc[0].to_dict()
+# # # # # Store best results
+# # # # print(f"Selected subsample={best_sc['subsample']}, "
+# # # #       f"colsample_bytree={best_sc['colsample_bytree']} "
+# # # #       f"(min test_error={best_sc['test_error']:.6f}, AUC={best_sc['test_auc']:.6f}, "
+# # # #       f"best_round={best_sc['best_round']})")
+
+# # # # tuned_subsample = float(best_sc['subsample']) # Extract best subsample
+# # # # tuned_colsample = float(best_sc['colsample_bytree']) # Extract best colsample_bytree
+
+# # # # # Set ETA values to try
+# # # # etas = [0.3, 0.1, 0.05, 0.01, 0.005]
+# # # # # Set base parameters
+# # # # base_params = {
+# # # #     "objective": "binary:logistic",
+# # # #     "eval_metric": ["auc", "error"],
+# # # #     "max_depth": tuned_max_depth, # Use tuned value for max depth
+# # # #     "min_child_weight": tuned_min_child, # Use tuned value for min_child_weight
+# # # #     "gamma": tuned_gamma, # Use tuned value for gamma
+# # # #     "subsample": tuned_subsample, # Use tuned value for subsample
+# # # #     "colsample_bytree": tuned_colsample, # Use tuned value for colsample_bytree
+# # # #     "tree_method": "hist",
+# # # #     "seed": 111111,
+# # # #     "nthread": 1,                  # single core
+# # # # }
+
+# # # # ### Be careful this can take a long time to run ###
+# # # # curves = []     # per-iteration logs for plotting
+# # # # summaries = []  # one row per eta
+# # # # # For each learning rate
+# # # # for eta in tqdm(etas, desc="Learning-rate CV (serial)"):
+# # # #     params = base_params.copy() # Create copy of parmameters
+# # # #     params["eta"] = float(eta) # Update ETA value
+# # # #     # Apply xgb.cv
+# # # #     cv = xgb.cv(
+# # # #         params=params, # Set parameters
+# # # #         dtrain=dtrain_w, # Set training data
+# # # #         num_boost_round=1000,  # run to 1000 unless ES stops early
+# # # #         nfold=5, # Set folds for cross validation
+# # # #         early_stopping_rounds=20, # Set early stopping rounds
+# # # #         stratified=True,
+# # # #         shuffle=True,
+# # # #         verbose_eval=False,
+# # # #         seed=111111,
+# # # #     )
+
+# # # #     # Extract data for model performance
+# # # #     df_log = cv.reset_index().rename(columns={"index": "iter"})
+# # # #     df_log["iter"] = df_log["iter"] + 1 # Increment iterations to get real number
+# # # #     # fix hyphenated column names for plotnine
+# # # #     df_log = df_log.rename(columns=lambda c: c.replace("-", "_"))
+# # # #     df_log["eta"] = str(eta) # Store ETA value as a string
+# # # #     curves.append(df_log) # Add values to data store
+
+# # # #     # Identify best iteration
+# # # #     best_round = len(cv)
+# # # #     best_row = cv.iloc[best_round - 1] # Identify best row
+
+
+# # # #     best_err = float(best_row["test-error-mean"]) # Extract best error value
+# # # #     best_auc = float(best_row["test-auc-mean"]) # Extract best AUC value
+# # # #     # Store results
+# # # #     summaries.append({"eta": eta, "best_round": best_round, "test_error": best_err, "test_auc": best_auc})
+
+# # # # # Combine curve data
+# # # # curves_df = pd.concat(curves, ignore_index=True)
+# # # # # Create data frame of result data
+# # # # summ_df = pd.DataFrame(summaries).sort_values(
+# # # #     ["test_error","test_auc"] ,
+# # # #     ascending=[True, False]
+# # # # ).reset_index(drop=True)
+
+# # # # best_eta = float(summ_df.iloc[0]["eta"]) # Extract best learning rate
+# # # # best_round = int(summ_df.iloc[0]["best_round"]) # Extract best round
+# # # # print(f"Selected eta={best_eta} with best_round={best_round}, " # Print results
+# # # #       f"test_error={summ_df.iloc[0]['test_error']:.6f}, "
+# # # #       f"AUC={summ_df.iloc[0]['test_auc']:.6f}")
+
+# # # # tuned_eta = float(best_eta) # Extract best learning rate
+
+
+
+# # # # print(
+# # # #     f"\nFinal tuned hyperparameters:\n"
+# # # #     f"  max_depth        = {tuned_max_depth}\n"
+# # # #     f"  min_child_weight = {tuned_min_child}\n"
+# # # #     f"  gamma            = {tuned_gamma}\n"
+# # # #     f"  subsample        = {tuned_subsample}\n"
+# # # #     f"  colsample_bytree = {tuned_colsample}\n"
+# # # #     f"  eta              = {tuned_eta}\n"
+# # # #     f"  best_round       = {best_round}"
+# # # # )
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # # Best Parameters & Weighted
+# # # DO NOT RUN THE TUNING PARAMETERS IT TAKES AROUND 1 HOUR ON CRC
+
+# max_depth        = 10
+# min_child_weight = 5
+# gamma            = 0.0
+# subsample        = 0.6
+# colsample_bytree = 0.6
+# eta              = 0.3
+# best_round       = 5
+
+
+
+
+
+
+
 
 # # Count values
-counts = pd.Series(y_train).value_counts().sort_index()
-neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
-print(f"Number of negative samples: {neg}")
-print(f"Number of positive samples: {pos}")
+# counts = pd.Series(y_train).value_counts().sort_index()
+# neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
+# print(f"Number of negative samples: {neg}")
+# print(f"Number of positive samples: {pos}")
 
-# Calculate ratio
-ratio = neg / pos
-# Set ratio as weight for positive samples
-w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
+# # Calculate ratio
+# ratio = neg / pos
+# # Set ratio as weight for positive samples
+# w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
 
-# Build weighted DMatrices
-dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
+# # Build weighted DMatrices
+# dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
 
-watchlist = [(dtrain_w, "train")] # Set data for evaluation
-xgb_w = xgb.train(params, # Set parameters
-                    dtrain_w,  # Set training data
-                    num_boost_round=3, # Set number of rounds
-                    evals=watchlist,  # Set data to evaluate on
-                    verbose_eval=50) # Set print out frequency
-
-test_pred_w = xgb_w.predict(dtest) # Create predictions
-
-
-# Convert predictions into classes at 0.5
-test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
-
-
-print("\nConfusion matrix:")
-cm = (confusion_matrix(y_test, test_pred_cls_w))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-plt.savefig("confusion_matrix_weighted.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("\nAccuracy):")
-print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
-
-
-
-
-
-
-
+# params = {
+#     "objective": "binary:logistic",
+#     "eval_metric": ["auc", "error"],
+#     "max_depth": max_depth, # Use tuned value for max depth
+#     "min_child_weight": min_child_weight, # Use tuned value for min_child_weight
+#     "gamma": gamma, # Use tuned value for gamma
+#     "subsample": subsample, # Use tuned value for subsample
+#     "colsample_bytree": colsample_bytree, # Use tuned value for colsample_bytree
+#     "eta": eta, # Use tuned value for eta
+#     "tree_method": "hist",
+#     "seed": 111111,
+#     "nthread": 1,                  # single core
+# }
 
+# num_boost_round = best_round # Set number of rounds
 
-
-
-# # # #XGBoost Tuning to get the best parameters
-# # # # DO NOT RUN THIS BLOCK OF CODE USE THE SAVED VARIABLES 
-
-# # # params = {
-# # #     "objective": "binary:logistic",   # Set objective
-# # #     "eta": 0.1,                       # Set learning rate
-# # #     "eval_metric": ["auc", "error"],  # Track both AUC and error
-# # #     "tree_method": "hist",
-# # #     "seed": 111111,
-# # #     "nthread": 1,                     # Parallel threads
-# # # }
-
-# # # # Run CV inside XGBoost
-# # # cv_res = xgb.cv(
-# # #     params=params,
-# # #     dtrain=dtrain_w,              # Training data (DMatrix)
-# # #     num_boost_round=400,       # Number of rounds
-# # #     nfold=5,                    # 5-fold CV
-# # #     verbose_eval=20,            # Print every 20 iters
-# # #     stratified=True,            # Good practice for classification
-# # #     shuffle=True,
-# # # )
-
-# # # cv_res
-
-# # # # Identify best iteration
-# # # #Remove idmix if you wan tot
-# # # best_idx = cv_res['test-error-mean'].idxmin()
-# # # best_iter = int(best_idx) + 1 # Increment by 1 to get iteration
-# # # best_err  = float(cv_res.loc[best_idx, 'test-error-mean']) # Extract test error
-# # # best_auc  = float(cv_res.loc[best_idx, 'test-auc-mean']) if 'test-auc-mean' in cv_res.columns else np.nan # Extract test AUC
-
-# # # # Print results
-# # # print(f"Best iteration (by min test error): {best_iter}")
-# # # print(f"Min test error at best iter: {best_err:.6f}")
-# # # if not np.isnan(best_auc):
-# # #     print(f"Test AUC at best iter: {best_auc:.6f}")
-
-# # # # Set range of parameter values to try
-# # # grid = {
-# # #     "max_depth": [3,  7, 10],
-# # #     "min_child_weight": [ 5, 7, 10],
-# # # }
-# # # param_grid = list(ParameterGrid(grid))
-
-# # # # Set base model parameters
-# # # base_params = {
-# # #     "objective": "binary:logistic",
-# # #     "eta": 0.10,
-# # #     "eval_metric": ["error", "auc"],
-# # #     "tree_method": "hist",
-# # #     "seed": 111111,
-# # #     "nthread": 1,  # keep each worker single-threaded to avoid oversubscription
-# # # }
-
-
-# # # def run_one_cv(md, mcw):
-# # #     """Run xgb.cv for a single (max_depth, min_child_weight) pair and return best metrics."""
-# # #     params = base_params.copy()
-# # #     params.update({"max_depth": int(md), "min_child_weight": int(mcw)})
-
-# # #     cv = xgb.cv(
-# # #         params=params,
-# # #         dtrain=dtrain_w,              # DMatrix from earlier
-# # #         num_boost_round=1000,        # nrounds = 100
-# # #         nfold=5,                    # 5-fold CV
-# # #         early_stopping_rounds=20,   # stop if no improvement
-# # #         stratified=True,
-# # #         shuffle=True,
-# # #         verbose_eval=False,
-# # #         seed=111111,
-# # #     )
-
-# # #     # Best round is the length of the early-stopped trace
-# # #     best_round = len(cv)
-
-# # #     # Read AUC & error at the best round row explicitly
-# # #     best_row = cv.iloc[best_round - 1]
-# # #     best_err = float(best_row["test-error-mean"])
-# # #     best_auc = float(best_row["test-auc-mean"])
-
-# # #     # Return results
-# # #     return {
-# # #         "max_depth": md,
-# # #         "min_child_weight": mcw,
-# # #         "best_round": best_round,
-# # #         "test_error": best_err,
-# # #         "test_auc": best_auc,
-# # #     }
-
-# # # results = []
-# # # for p in tqdm(param_grid, desc="Grid CV (serial)"):
-# # #     results.append(run_one_cv(p["max_depth"], p["min_child_weight"]))
-
-
-
-# # # # Create and sort results data frame
-# # # cv_results_df = (
-# # #     pd.DataFrame(results)
-# # #       .sort_values(["test_error", "test_auc"], ascending=[True, False])
-# # #       .reset_index(drop=True)
-# # # )
-
-# # # # Identify best parameters0
-# # # best_pair = cv_results_df.iloc[0].to_dict()
-# # # print("Best (by min test_error, then max AUC):", best_pair)    
-
-
-# # # # Create results data frame
-# # # res_db = (
-# # #     cv_results_df[["max_depth", "min_child_weight", "test_auc", "test_error"]]
-# # #     .rename(columns={"test_auc": "auc", "test_error": "error"})
-# # #     .copy()
-# # # )
-
-# # # tuned_max_depth = int(best_pair['max_depth']) # Extract max depth
-# # # tuned_min_child = int(best_pair['min_child_weight']) # Extract min_child_weight
-
-# # # # Define gamma grid
-# # # gamma_vals = [0.00, 0.05, 0.10, 0.15, 0.20]
-
-# # # # Set base parameters
-# # # base_params = {
-# # #     "objective": "binary:logistic",
-# # #     "eta": 0.10,
-# # #     "max_depth": tuned_max_depth, # Uuse tuned value of max depth
-# # #     "min_child_weight": tuned_min_child, # Use tuned value of min child weight
-# # #     "tree_method": "hist",
-# # #     "eval_metric": ["auc", "error"],
-# # #     "seed": 111111,
-# # #     "nthread": 1,
-# # # }
-
-# # # ### Be careful this can take a long time to run ###
-# # # rows = [] # Create data frame to store valus
-# # # for g in tqdm(gamma_vals, desc="Gamma CV (serial)"): # For each gamma value
-# # #     params = base_params.copy() # Create copy of base parameters
-# # #     params["gamma"] = float(g) # Replace value with current gamma value
-
-# # #     # Run xgb.cv
-# # #     cv = xgb.cv(
-# # #         params=params,
-# # #         dtrain=dtrain_w,                # Set training data
-# # #         num_boost_round=1000,          # Set number of rounds
-# # #         nfold=5,                      # Set folds for cross validation
-# # #         early_stopping_rounds=20,     # Set early stopping rounds
-# # #         stratified=True,
-# # #         shuffle=True,
-# # #         verbose_eval=False,
-# # #         seed=111111, #Set seed
-# # #     )
-
-# # #     # Best iteration is the length of the early-stopped trace
-# # #     best_round = len(cv)
-# # #     best_row = cv.iloc[best_round - 1]
-# # #     # Store results from current iteration
-# # #     rows.append({
-# # #         "gamma": g,
-# # #         "best_round": int(best_round),
-# # #         "test_auc": float(best_row["test-auc-mean"]),
-# # #         "test_error": float(best_row["test-error-mean"]),
-# # #     })
-
-# # # # Join results into data frame
-# # # gamma_results = (pd.DataFrame(rows)
-# # #                    .sort_values(['test_error', 'test_auc'], ascending=[True, False])
-# # #                    .reset_index(drop=True))
-# # # # # View results
-# # # # display(gamma_results)
-# # # # Extract best value
-# # # best_gamma = float(gamma_results.iloc[0]['gamma'])
-# # # # Print out vest value
-# # # print(f"Selected gamma (by min test_error, then max AUC): {best_gamma:.2f}")
-
-# # # tuned_gamma = float(best_gamma) # Extract best gamma value
-
-
-# # # # Create grid of possible values
-# # # grid = {
-# # #     "subsample":        [0.6, 0.7, 0.8, 0.9, 1.0],
-# # #     "colsample_bytree": [0.6, 0.7, 0.8, 0.9, 1.0],
-# # # }
-# # # # Convert into parameter grid and then list
-# # # param_grid = list(ParameterGrid(grid))
-# # # # Set base parameters
-# # # base_params = {
-# # #     "objective": "binary:logistic",
-# # #     "eta": 0.10,
-# # #     "max_depth": tuned_max_depth, # Use tuned value for max depth
-# # #     "min_child_weight": tuned_min_child, # Use tuned value for min child weight
-# # #     "gamma": tuned_gamma, # Use tuned value for gamma
-# # #     "tree_method": "hist",
-# # #     "eval_metric": ["auc", "error"],
-# # #     "seed": 111111,
-# # #     "nthread": 1,                     # single core
-# # # }
-
-# # # # Create function
-# # # def run_one_cv(subsample, colsample_bytree):
-# # #     """Run xgb.cv for a single (subsample, colsample_bytree) and return best metrics."""
-# # #     params = base_params.copy() # Create copy of base parameters
-# # #     params.update({ # Update with values of subsample and colsample_bytree
-# # #         "subsample": float(subsample),
-# # #         "colsample_bytree": float(colsample_bytree),
-# # #     })
-# # #     # Run xgb.cv
-# # #     cv = xgb.cv(
-# # #         params=params,  # Set parameters
-# # #         dtrain=dtrain_w,  # Set training data
-# # #         num_boost_round=1000, # Set number of rounds
-# # #         nfold=5,  # Set cross-validation folds
-# # #         early_stopping_rounds=20, # Set number of early stopping rounds
-# # #         stratified=True,
-# # #         shuffle=True,
-# # #         verbose_eval=False,
-# # #         seed=111111, # Set seed
-# # #     )
-
-# # #     best_round = len(cv)             # early-stopped length
-# # #     best_row = cv.iloc[best_round - 1] # Identify best row
-# # #     # Return results
-# # #     return {
-# # #         "subsample": subsample,
-# # #         "colsample_bytree": colsample_bytree,
-# # #         "best_round": int(best_round),
-# # #         "test_auc": float(best_row["test-auc-mean"]),
-# # #         "test_error": float(best_row["test-error-mean"]),
-# # #     }
-
-# # # ### Be careful this can take a long time to run ###
-# # # rows = [] # Create empty list to store results
-# # # # For each set of parameters
-# # # for p in tqdm(param_grid, desc="Subsample × Colsample_bytree CV (serial)"):
-# # #     rows.append(run_one_cv(p["subsample"], p["colsample_bytree"])) # Run tuning function and store results
-# # # # Convert results into data frame
-# # # sc_results = (pd.DataFrame(rows)
-# # #                 .sort_values(['test_error','test_auc'], ascending=[True, False])
-# # #                 .reset_index(drop=True))
-# # # # # View results
-# # # # display(sc_results.head(10))
-# # # # Identify best results
-# # # best_sc = sc_results.iloc[0].to_dict()
-# # # # Store best results
-# # # print(f"Selected subsample={best_sc['subsample']}, "
-# # #       f"colsample_bytree={best_sc['colsample_bytree']} "
-# # #       f"(min test_error={best_sc['test_error']:.6f}, AUC={best_sc['test_auc']:.6f}, "
-# # #       f"best_round={best_sc['best_round']})")
-
-# # # tuned_subsample = float(best_sc['subsample']) # Extract best subsample
-# # # tuned_colsample = float(best_sc['colsample_bytree']) # Extract best colsample_bytree
-
-# # # # Set ETA values to try
-# # # etas = [0.3, 0.1, 0.05, 0.01, 0.005]
-# # # # Set base parameters
-# # # base_params = {
-# # #     "objective": "binary:logistic",
-# # #     "eval_metric": ["auc", "error"],
-# # #     "max_depth": tuned_max_depth, # Use tuned value for max depth
-# # #     "min_child_weight": tuned_min_child, # Use tuned value for min_child_weight
-# # #     "gamma": tuned_gamma, # Use tuned value for gamma
-# # #     "subsample": tuned_subsample, # Use tuned value for subsample
-# # #     "colsample_bytree": tuned_colsample, # Use tuned value for colsample_bytree
-# # #     "tree_method": "hist",
-# # #     "seed": 111111,
-# # #     "nthread": 1,                  # single core
-# # # }
-
-# # # ### Be careful this can take a long time to run ###
-# # # curves = []     # per-iteration logs for plotting
-# # # summaries = []  # one row per eta
-# # # # For each learning rate
-# # # for eta in tqdm(etas, desc="Learning-rate CV (serial)"):
-# # #     params = base_params.copy() # Create copy of parmameters
-# # #     params["eta"] = float(eta) # Update ETA value
-# # #     # Apply xgb.cv
-# # #     cv = xgb.cv(
-# # #         params=params, # Set parameters
-# # #         dtrain=dtrain_w, # Set training data
-# # #         num_boost_round=1000,  # run to 1000 unless ES stops early
-# # #         nfold=5, # Set folds for cross validation
-# # #         early_stopping_rounds=20, # Set early stopping rounds
-# # #         stratified=True,
-# # #         shuffle=True,
-# # #         verbose_eval=False,
-# # #         seed=111111,
-# # #     )
-
-# # #     # Extract data for model performance
-# # #     df_log = cv.reset_index().rename(columns={"index": "iter"})
-# # #     df_log["iter"] = df_log["iter"] + 1 # Increment iterations to get real number
-# # #     # fix hyphenated column names for plotnine
-# # #     df_log = df_log.rename(columns=lambda c: c.replace("-", "_"))
-# # #     df_log["eta"] = str(eta) # Store ETA value as a string
-# # #     curves.append(df_log) # Add values to data store
-
-# # #     # Identify best iteration
-# # #     best_round = len(cv)
-# # #     best_row = cv.iloc[best_round - 1] # Identify best row
-
-
-# # #     best_err = float(best_row["test-error-mean"]) # Extract best error value
-# # #     best_auc = float(best_row["test-auc-mean"]) # Extract best AUC value
-# # #     # Store results
-# # #     summaries.append({"eta": eta, "best_round": best_round, "test_error": best_err, "test_auc": best_auc})
-
-# # # # Combine curve data
-# # # curves_df = pd.concat(curves, ignore_index=True)
-# # # # Create data frame of result data
-# # # summ_df = pd.DataFrame(summaries).sort_values(
-# # #     ["test_error","test_auc"] ,
-# # #     ascending=[True, False]
-# # # ).reset_index(drop=True)
-
-# # # best_eta = float(summ_df.iloc[0]["eta"]) # Extract best learning rate
-# # # best_round = int(summ_df.iloc[0]["best_round"]) # Extract best round
-# # # print(f"Selected eta={best_eta} with best_round={best_round}, " # Print results
-# # #       f"test_error={summ_df.iloc[0]['test_error']:.6f}, "
-# # #       f"AUC={summ_df.iloc[0]['test_auc']:.6f}")
-
-# # # tuned_eta = float(best_eta) # Extract best learning rate
-
-
-
-# # # print(
-# # #     f"\nFinal tuned hyperparameters:\n"
-# # #     f"  max_depth        = {tuned_max_depth}\n"
-# # #     f"  min_child_weight = {tuned_min_child}\n"
-# # #     f"  gamma            = {tuned_gamma}\n"
-# # #     f"  subsample        = {tuned_subsample}\n"
-# # #     f"  colsample_bytree = {tuned_colsample}\n"
-# # #     f"  eta              = {tuned_eta}\n"
-# # #     f"  best_round       = {best_round}"
-# # # )
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # Best Parameters & Weighted
-# # DO NOT RUN THE TUNING PARAMETERS IT TAKES AROUND 1 HOUR ON CRC
-
-max_depth        = 10
-min_child_weight = 5
-gamma            = 0.0
-subsample        = 0.6
-colsample_bytree = 0.6
-eta              = 0.3
-best_round       = 5
-
-
-
-
-
-
-
-
-# Count values
-counts = pd.Series(y_train).value_counts().sort_index()
-neg = int(counts.get(0, 0)); pos = int(counts.get(1, 0)) # Calculate positive and negative samples
-print(f"Number of negative samples: {neg}")
-print(f"Number of positive samples: {pos}")
-
-# Calculate ratio
-ratio = neg / pos
-# Set ratio as weight for positive samples
-w_tr = np.where(y_train == 1, ratio, 1.0).astype(np.float32)
-
-# Build weighted DMatrices
-dtrain_w = xgb.DMatrix(X_train.values, label=y_train, weight=w_tr)
-
-params = {
-    "objective": "binary:logistic",
-    "eval_metric": ["auc", "error"],
-    "max_depth": max_depth, # Use tuned value for max depth
-    "min_child_weight": min_child_weight, # Use tuned value for min_child_weight
-    "gamma": gamma, # Use tuned value for gamma
-    "subsample": subsample, # Use tuned value for subsample
-    "colsample_bytree": colsample_bytree, # Use tuned value for colsample_bytree
-    "eta": eta, # Use tuned value for eta
-    "tree_method": "hist",
-    "seed": 111111,
-    "nthread": 1,                  # single core
-}
-
-num_boost_round = best_round # Set number of rounds
-
-watchlist = [(dtrain_w, "train")] # Set data for evaluation
-xgb_tuned = xgb.train(params, # Set parameters
-                    dtrain_w,  # Set training data
-                    num_boost_round=num_boost_round, # Set number of rounds
-                    evals=watchlist,  # Set data to evaluate on
-                    verbose_eval=50) # Set print out frequency
-
-test_pred_w = xgb_tuned.predict(dtest) # Create predictions
-
-
-# Convert predictions into classes at 0.5
-test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
-
-
-print("\nConfusion matrix:")
-cm = (confusion_matrix(y_test, test_pred_cls_w))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("\nAccuracy):")
-print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
-
-
-
-# Convert predictions into classes at 0.5
-test_pred_cls_w = (test_pred_w >= 0.11).astype(int)
-
-
-print("\nConfusion matrix:")
-cm = (confusion_matrix(y_test, test_pred_cls_w))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-plt.savefig("confusion_matrix_weighted_and_tuned_11.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("\nAccuracy):")
-print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
-
-
-
-
-# Convert predictions into classes at 0.5
-test_pred_cls_w = (test_pred_w >= 0.4).astype(int)
-
-
-print("\nConfusion matrix:")
-cm = (confusion_matrix(y_test, test_pred_cls_w))
-disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
-disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Weighted XGBoost") # Set title
-plt.savefig("confusion_matrix_weighted_and_tuned_115.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("\nAccuracy):")
-print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
-
-
-
-
-
-# SHAP values to see importance of each column in the weighted tuned XGBoost model
-
-# Create TreeExplainer and compute SHAP values
-explainer = shap.TreeExplainer(xgb_tuned)
-shap_values = explainer(X_train)
-
-plt.figure()  # start a clean figure
-shap.plots.bar(shap_values, max_display=10)
-plt.title("Top 10 SHAP Feature Importances")   # optional title
-plt.savefig("shap_bar_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
-plt.close()
-
-# Create and save beeswarm plot
-plt.figure(figsize=(10, 8))   # optional: wider figure
-shap.plots.beeswarm(shap_values, max_display=25)
-plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
-plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
-plt.close()
+# watchlist = [(dtrain_w, "train")] # Set data for evaluation
+# xgb_tuned = xgb.train(params, # Set parameters
+#                     dtrain_w,  # Set training data
+#                     num_boost_round=num_boost_round, # Set number of rounds
+#                     evals=watchlist,  # Set data to evaluate on
+#                     verbose_eval=50) # Set print out frequency
+
+# test_pred_w = xgb_tuned.predict(dtest) # Create predictions
+
+
+# # Convert predictions into classes at 0.5
+# test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
+
+
+# print("\nConfusion matrix:")
+# cm = (confusion_matrix(y_test, test_pred_cls_w))
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+# plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+# plt.close()
+# print("\nAccuracy):")
+# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
+# # Convert predictions into classes at 0.5
+# test_pred_cls_w = (test_pred_w >= 0.11).astype(int)
+
+
+# print("\nConfusion matrix:")
+# cm = (confusion_matrix(y_test, test_pred_cls_w))
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+# plt.savefig("confusion_matrix_weighted_and_tuned_11.png", dpi=300, bbox_inches="tight")
+# plt.close()
+# print("\nAccuracy):")
+# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
+
+# # Convert predictions into classes at 0.5
+# test_pred_cls_w = (test_pred_w >= 0.4).astype(int)
+
+
+# print("\nConfusion matrix:")
+# cm = (confusion_matrix(y_test, test_pred_cls_w))
+# disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
+# disp.plot(cmap="Blues") # Set color map
+# plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+# plt.savefig("confusion_matrix_weighted_and_tuned_115.png", dpi=300, bbox_inches="tight")
+# plt.close()
+# print("\nAccuracy):")
+# print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
+
+
+
+
+
+# # SHAP values to see importance of each column in the weighted tuned XGBoost model
+
+# # Create TreeExplainer and compute SHAP values
+# explainer = shap.TreeExplainer(xgb_tuned)
+# shap_values = explainer(X_train)
+
+# plt.figure()  # start a clean figure
+# shap.plots.bar(shap_values, max_display=10)
+# plt.title("Top 10 SHAP Feature Importances")   # optional title
+# plt.savefig("shap_bar_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+# plt.close()
+
+# # Create and save beeswarm plot
+# plt.figure(figsize=(10, 8))   # optional: wider figure
+# shap.plots.beeswarm(shap_values, max_display=25)
+# plt.title("SHAP Beeswarm — Weighted & Tuned XGBoost")  # optional title
+# plt.savefig("shap_beeswarm_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
+# plt.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Recurrent Neural Network (RNN) with LSTM
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+data_split = int(len(df) * .8)
+
+train_data = df.iloc[:data_split]
+test_data = df.iloc[data_split:]
+
+# print(f"Full train_data Shape: {train_data.shape}")
+# print(f"Full test_data Shape: {test_data.shape}")
+# print(f"Attack train_data :{len(train_data[train_data['Normal_Attack'] == 1])}, Normal train_data : {len(train_data[train_data['Normal_Attack'] == 0])}")
+# print(f"Attack test_data :{len(test_data[test_data['Normal_Attack'] == 1])}, Normal test_data : {len(test_data[test_data['Normal_Attack'] == 0])}")
+
+# print(df.columns)
+
+
+# Extract columns and create Test and Train
+feature_cols = df.columns[1:-1]
+
+X_train_raw = train_data[feature_cols].copy()
+X_test_raw  = test_data[feature_cols].copy()
+
+# Ensure numeric dtype 
+X_train = X_train_raw.apply(pd.to_numeric, errors='coerce')
+X_test  = X_test_raw.apply(pd.to_numeric, errors='coerce')
+
+# Extract response variable
+y_train = train_data['Normal_Attack'].astype(int)
+y_test  = test_data['Normal_Attack'].astype(int)
+
+# print(
+#     f"X_train: columns={X_train.columns.tolist()}, shape={X_train.shape}\n"
+#     f"X_test : columns={X_test.columns.tolist()}, shape={X_test.shape}\n"
+#     f"y_train: name={y_train.name}, shape={y_train.shape}\n"
+#     f"y_test : name={y_test.name}, shape={y_test.shape}"
+# )
+
+# print("NaNs in X_train:", X_train.isna().sum().sum())
+# print("NaNs in X_test :", X_test.isna().sum().sum())
+
+#Scale
+
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train.values)
+X_test_scaled = scaler.transform(X_test.values)
+
+y_train_np = y_train.values.astype(np.int32)
+y_test_np = y_test.values.astype(np.int32)
+
+n_features = X_train_scaled.shape[1]
+# print(f"number of features : {n_features}")
+
+def make_windows(X, y, seq_len=50, stride=1):
+    Xs, ys = [], []
+    for start in range(0, len(X) - seq_len + 1, stride):
+        end = start + seq_len
+        Xs.append(X[start:end])
+        ys.append(y[end - 1])  # label at last timestep
+    return np.array(Xs, dtype=np.float32), np.array(ys, dtype=np.int32)
+
+SEQ_LEN = 50
+STRIDE = 5
+
+X_train_seq, y_train_seq = make_windows(X_train_scaled, y_train_np, SEQ_LEN, STRIDE)
+X_test_seq, y_test_seq   = make_windows(X_test_scaled,  y_test_np,  SEQ_LEN, STRIDE)
+
+print("X_train_seq shape:", X_train_seq.shape)
+print("y_train_seq shape:", y_train_seq.shape)
+print("X_test_seq shape :", X_test_seq.shape)
+print("y_test_seq shape :", y_test_seq.shape)
+
+
+
+BATCH_SIZE = 256
+
+train_ds = tf.data.Dataset.from_tensor_slices((X_train_seq, y_train_seq))
+train_ds = train_ds.shuffle(20000).batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+
+test_ds = tf.data.Dataset.from_tensor_slices((X_test_seq, y_test_seq))
+test_ds = test_ds.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+
+for xb, yb in train_ds.take(1):
+    print("Batch X:", xb.shape)
+    print("Batch y:", yb.shape)
+
+
+
+
+
+
+
+
