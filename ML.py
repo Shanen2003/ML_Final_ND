@@ -75,20 +75,25 @@ df = df.dropna().reset_index(drop=True)
 
 df['Normal_Attack'] = df['Normal_Attack'].map({'Normal': 0, 'Attack': 1}).astype('float32')
 
-normal = df[df['Normal_Attack'] == 0]
-attack = df[df['Normal_Attack'] == 1]
+# normal = df[df['Normal_Attack'] == 0]
+# attack = df[df['Normal_Attack'] == 1]
 
-length_normal = len(normal)*.8
-length_attack = len(attack)*.8
+data_split = int(len(df) * .8)
 
-train_normal = normal.iloc[:int(length_normal)]
-test_normal = normal.iloc[int(length_normal):]
+df_train = df.iloc[:data_split]
+df_test = df.iloc[data_split:]
 
-train_attack = attack.iloc[:int(length_attack)]
-test_attack = attack.iloc[int(length_attack):]
+# length_normal = len(normal)*.8
+# length_attack = len(attack)*.8
 
-df_train = pd.concat([train_normal, train_attack]).sort_index()
-df_test = pd.concat([test_normal, test_attack]).sort_index()
+# train_normal = normal.iloc[:int(length_normal)]
+# test_normal = normal.iloc[int(length_normal):]
+
+# train_attack = attack.iloc[:int(length_attack)]
+# test_attack = attack.iloc[int(length_attack):]
+
+# df_train = pd.concat([train_normal, train_attack]).sort_index()
+# df_test = pd.concat([test_normal, test_attack]).sort_index()
 
 # Extract columns and create Test and Train
 feature_cols = df.columns[1:-1]
