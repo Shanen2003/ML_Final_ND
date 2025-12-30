@@ -1087,7 +1087,7 @@ print(accuracy_score(y_test, test_pred_cls_w)) # Get Accuracy
 
 
 # # # Best Parameters & Weighted
-# # # DO NOT RUN THE TUNING PARAMETERS IT TAKES AROUND 1 HOUR ON CRC
+# # # DO NOT RUN THE TUNING PARAMETERS IT TAKES FOREVER
 
 max_depth        = 10
 min_child_weight = 5
@@ -1144,6 +1144,13 @@ xgb_tuned = xgb.train(params, # Set parameters
 test_pred_w = xgb_tuned.predict(dtest) # Create predictions
 
 
+
+
+
+
+
+
+
 # Convert predictions into classes at 0.5
 test_pred_cls_w = (test_pred_w >= 0.5).astype(int)
 
@@ -1152,7 +1159,7 @@ print("\nConfusion matrix:")
 cm = (confusion_matrix(y_test, test_pred_cls_w))
 disp = ConfusionMatrixDisplay(confusion_matrix=cm)# Set class labels
 disp.plot(cmap="Blues") # Set color map
-plt.title("Confusion Matrix — Weighted XGBoost") # Set title
+plt.title("Confusion Matrix — Weighted Tuned & Sensitive") # Set title
 plt.savefig("confusion_matrix_weighted_and_tuned.png", dpi=300, bbox_inches="tight")
 plt.close()
 print("\nAccuracy):")
